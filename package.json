@@ -20,6 +20,7 @@
   "dependencies": {
     "hat": "0.0.3",
     "lodash": "^3.6.0",
+    "merge": "^1.2.0",
     "ms": "^0.7.0"
   },
   "devDependencies": {
