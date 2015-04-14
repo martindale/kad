@@ -1,0 +1,31 @@
+{
+  "name": "kad",
+  "version": "0.0.0",
+  "description": "implementation of the kademlia dht for node",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha test/** --recursive",
+    "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --recursive"
+  },
+  "keywords": [
+    "dht",
+    "kademlia",
+    "p2p"
+  ],
+  "author": "Gordon Hall <gordon@gordonwritescode.com>",
+  "license": "LGPLv3",
+  "dependencies": {
+    "hat": "0.0.3",
+    "lodash": "^3.6.0",
+    "ms": "^0.7.0"
+  },
+  "devDependencies": {
+    "chai": "^2.2.0",
+    "istanbul": "^0.3.13",
+    "mocha": "^2.2.4",
+    "sinon": "^1.14.1"
+  }
+}
