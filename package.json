@@ -16,7 +16,7 @@
     "p2p"
   ],
   "author": "Gordon Hall <gordon@gordonwritescode.com>",
-  "license": "LGPLv3",
+  "license": "GPLv3",
   "dependencies": {
     "hat": "0.0.3",
     "lodash": "^3.6.0",
