@@ -8,9 +8,13 @@ An implementation of the Kademlia DHT for Node.
 
 ## Usage
 
+Install with NPM.
+
 ```bash
 npm install kad
 ```
+
+Then party.
 
 ```js
 var kademlia = require('kad');
@@ -37,10 +41,9 @@ dht.on('connect', function() {
 });
 ```
 
-Kad does not make assumption about how your nodes will store their data, instead
-relying on your to implement a storage adapter of your choice.
-
-This is as simple as providing a `get()` and `set()` method. Example:
+Kad does not make assumptions about how your nodes will store their data,
+instead relying on your to implement a storage adapter of your choice. This is
+as simple as providing a `get()` and `set()` method.
 
 ```js
 function FakeStorage() {
@@ -69,8 +72,7 @@ var dht = kademlia({
 
 ## License
 
-Kad - an implementation of the Kademlia DHT for Node.
-Copyright (C) 2015  Gordon Hall
+Copyright (C) 2015 Gordon Hall
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
