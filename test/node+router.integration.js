@@ -2,7 +2,10 @@
 
 var expect = require('chai').expect;
 var sinon = require('sinon');
+var constants = require('../lib/constants');
 var Node = require('../lib/node');
+var Contact = require('../lib/contact');
+var Bucket = require('../lib/bucket');
 
 function FakeStorage() {
   this.data = {};
@@ -26,23 +29,26 @@ var node1;
 var node2;
 var node3;
 
+var logLevel = Number(process.env.LOG_LEVEL);
+
 var node1opts = {
   address: '127.0.0.1',
   port: 65533,
-  storage: storage1
+  storage: storage1,
+  logLevel: logLevel
 };
 var node2opts = {
   address: '127.0.0.1',
   port: 65534,
-  storage: storage2
+  storage: storage2,
+  logLevel: logLevel
 };
 var node3opts = {
   address: '127.0.0.1',
   port: 65535,
-  storage: storage3
+  storage: storage3,
+  logLevel: logLevel
 };
-
-var logLevel = process.env.LOG_LEVEL;
 
 describe('Node+Router', function() {
 
@@ -102,6 +108,30 @@ describe('Node+Router', function() {
       });
     });
 
+    it('should emit an error if the connection fails', function(done) {
+      var node = Node({ address: '0.0.0.0', port: 65532, storage: new FakeStorage() });
+      var _findNode = sinon.stub(node, '_findNode', function(id, cb) {
+        return cb(new Error('fatal error'));
+      });
+      node.connect('127.0.0.1', 3333, function(err) {
+        expect(err.message).to.equal('fatal error');
+        _findNode.restore();
+        done();
+      });
+    });
+
+    it('should not require a callback', function(done) {
+      var node = Node({ address: '0.0.0.0', port: 65531, storage: new FakeStorage() });
+      var _findNode = sinon.stub(node, '_findNode', function(id, cb) {
+        return cb(new Error('fatal error'));
+      });
+      node.on('error', function(err) {
+        expect(err.message).to.equal('fatal error');
+        _findNode.restore();
+        done();
+      });
+      node.connect('127.0.0.1', 3333);
+    });
 
   });
 
@@ -110,7 +140,7 @@ describe('Node+Router', function() {
 
     it('should succeed in setting the value to the dht', function(done) {
       node1.set('beep', 'boop', function(err) {
-        expect(err).to.equal(null);
+        expect(err).to.not.be.ok;
         done();
       });
     });
@@ -122,6 +152,14 @@ describe('Node+Router', function() {
       node2.set('beep', 'boop', function(err) {
         expect(err.message).to.equal('fail');
         _set.restore();
+        done();
+      });
+    });
+
+    it('should callback with an error if _findNode fails', function(done) {
+      var node = Node({ address: '0.0.0.0', port: 65530, storage: new FakeStorage() });
+      node.set('beep', 'boop', function(err) {
+        expect(err.message).to.equal('Not connected to any peers');
         done();
       });
     });
