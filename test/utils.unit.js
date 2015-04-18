@@ -168,7 +168,7 @@ describe('Utils', function() {
 
   describe('#getRandomInBucketRangeBuffer', function() {
 
-    this.timeout(4000);
+    this.timeout(5000);
 
     it('should get a random bucket within the range', function() {
       function checkZero(buffer, limit) {
