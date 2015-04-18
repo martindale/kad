@@ -25,50 +25,19 @@ var dht = kademlia({
   seeds: [
     { address: 'some.remote.host', port: 65535 }
   ],
-  storage: { /* { get: fn, set: fn } */ }
+  storage: new StorageAdapter()
 });
 
 dht.on('connect', function() {
-
-  // store a value in the DHT
-  dht.set('beep', 'boop', function(err) {
-    // retrieve the value from the DHT
-    dht.get('beep', function(err, value) {
-      console.log(value); // 'boop'
-    });
-  });
-
+  dht.set('boop', 'beep', function(err) { });
+  dht.get('beep', function(err, value) { });
 });
 ```
 
 Kad does not make assumptions about how your nodes will store their data,
-instead relying on your to implement a storage adapter of your choice. This is
-as simple as providing a `get()` and `set()` method.
-
-```js
-function FakeStorage() {
-  this.data = {};
-}
-
-FakeStorage.prototype.get = function(key, callback) {
-  if (!this.data[key]) return callback(new Error('not found'));
-  callback(null, this.data[key]]);
-};
-
-FakeStorage.prototype.set = function(key, value, callback) {
-  this.data[key] = value;
-  callback(null);
-};
-```
-
-Then you give it to Kad like so:
-
-```js
-var dht = kademlia({
-  // ...
-  storage: new FakeStorage()
-});
-```
+instead relying on you to implement a storage adapter of your choice. This is
+as simple as providing both `get(key, callback)` and `set(key, value, callback)`
+methods.
 
 ## License
 
