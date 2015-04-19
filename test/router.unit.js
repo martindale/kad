@@ -27,6 +27,10 @@ FakeStorage.prototype.del = function(key, cb) {
   cb(null);
 };
 
+FakeStorage.prototype.createReadStream = function() {
+
+};
+
 describe('Router', function() {
 
   describe('#_queryContact', function() {

@@ -48,8 +48,8 @@ dht.on('connect', function() {
 
 Kad does not make assumptions about how your nodes will store their data,
 instead relying on you to implement a storage adapter of your choice. This is
-as simple as providing `get(key, callback)`, `put(key, value, callback)`, and
-`del(key, callback)` methods.
+as simple as providing `get(key, callback)`, `put(key, value, callback)`,
+`del(key, callback)`, `createReadStream()` methods.
 
 This works well with [LevelUp](https://github.com/rvagg/node-levelup), but you
 could conceivably implement any storage layer you like provided you expose the

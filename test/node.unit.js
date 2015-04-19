@@ -27,6 +27,10 @@ FakeStorage.prototype.del = function(key, cb) {
   cb(null);
 };
 
+FakeStorage.prototype.createReadStream = function() {
+
+};
+
 describe('Node', function() {
 
   describe('#_findValue', function() {

@@ -26,6 +26,10 @@ FakeStorage.prototype.del = function(key, cb) {
   cb(null);
 };
 
+FakeStorage.prototype.createReadStream = function() {
+
+};
+
 var storage1 = new FakeStorage();
 var storage2 = new FakeStorage();
 var storage3 = new FakeStorage();
