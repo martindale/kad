@@ -33,6 +33,22 @@ FakeStorage.prototype.createReadStream = function() {
 
 describe('Node', function() {
 
+  describe('#get', function() {
+
+    it('should pass along error if _findValue fails', function(done) {
+      var node = Node({ address: '0.0.0.0', port: 65522, storage: new FakeStorage() });
+      var _findValue = sinon.stub(node, '_findValue', function(k, cb) {
+        cb(new Error('Failed for some reason'));
+      });
+      node.get('beep', function(err) {
+        expect(err.message).to.equal('Failed for some reason');
+        _findValue.restore();
+        done();
+      });
+    });
+
+  });
+
   describe('#_findValue', function() {
 
     it('should callback with an error if no value is found', function(done) {
