@@ -17,9 +17,14 @@ FakeStorage.prototype.get = function(key, cb) {
   cb(null, this.data[key]);
 };
 
-FakeStorage.prototype.set = function(key, val, cb) {
+FakeStorage.prototype.put = function(key, val, cb) {
   this.data[key] = val;
   cb(null, this.data[key]);
+};
+
+FakeStorage.prototype.del = function(key, cb) {
+  delete this.data[key];
+  cb(null);
 };
 
 describe('Router', function() {

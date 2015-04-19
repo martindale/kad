@@ -16,9 +16,14 @@ FakeStorage.prototype.get = function(key, cb) {
   cb(null, this.data[key]);
 };
 
-FakeStorage.prototype.set = function(key, val, cb) {
+FakeStorage.prototype.put = function(key, val, cb) {
   this.data[key] = val;
   cb(null, this.data[key]);
+};
+
+FakeStorage.prototype.del = function(key, cb) {
+  delete this.data[key];
+  cb(null);
 };
 
 var storage1 = new FakeStorage();
@@ -136,20 +141,20 @@ describe('Node+Router', function() {
   });
 
 
-  describe('#set', function() {
+  describe('#put', function() {
 
     it('should succeed in setting the value to the dht', function(done) {
-      node1.set('beep', 'boop', function(err) {
+      node1.put('beep', 'boop', function(err) {
         expect(err).to.not.be.ok;
         done();
       });
     });
 
     it('should pass an error to the callback if failed', function(done) {
-      var _set = sinon.stub(node2, 'set', function(k, v, cb) {
+      var _set = sinon.stub(node2, 'put', function(k, v, cb) {
         cb(new Error('fail'));
       });
-      node2.set('beep', 'boop', function(err) {
+      node2.put('beep', 'boop', function(err) {
         expect(err.message).to.equal('fail');
         _set.restore();
         done();
@@ -158,7 +163,7 @@ describe('Node+Router', function() {
 
     it('should callback with an error if _findNode fails', function(done) {
       var node = Node({ address: '0.0.0.0', port: 65530, storage: new FakeStorage() });
-      node.set('beep', 'boop', function(err) {
+      node.put('beep', 'boop', function(err) {
         expect(err.message).to.equal('Not connected to any peers');
         done();
       });
