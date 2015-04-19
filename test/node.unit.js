@@ -7,6 +7,7 @@ var constants = require('../lib/constants');
 var Node = require('../lib/node');
 var Contact = require('../lib/contact');
 var Bucket = require('../lib/bucket');
+var EventEmitter = require('events').EventEmitter;
 
 function FakeStorage() {
   this.data = {};
@@ -28,26 +29,10 @@ FakeStorage.prototype.del = function(key, cb) {
 };
 
 FakeStorage.prototype.createReadStream = function() {
-
+  return new EventEmitter();
 };
 
 describe('Node', function() {
-
-  describe('#get', function() {
-
-    it('should pass along error if _findValue fails', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65522, storage: new FakeStorage() });
-      var _findValue = sinon.stub(node, '_findValue', function(k, cb) {
-        cb(new Error('Failed for some reason'));
-      });
-      node.get('beep', function(err) {
-        expect(err.message).to.equal('Failed for some reason');
-        _findValue.restore();
-        done();
-      });
-    });
-
-  });
 
   describe('#_findValue', function() {
 
@@ -162,6 +147,142 @@ describe('Node', function() {
         port: 1234,
         nodeID: utils.createID('data')
       });
+    });
+
+  });
+
+  describe('#get', function() {
+
+    it('should pass along error if _findValue fails', function(done) {
+      var node = Node({ address: '0.0.0.0', port: 65522, storage: new FakeStorage() });
+      var _findValue = sinon.stub(node, '_findValue', function(k, cb) {
+        cb(new Error('Failed for some reason'));
+      });
+      node.get('beep', function(err) {
+        expect(err.message).to.equal('Failed for some reason');
+        _findValue.restore();
+        done();
+      });
+    });
+
+  });
+
+  describe('#_replicate', function() {
+
+    var stream = new EventEmitter();
+    var node = Node({ address: '0.0.0.0', port: 65521, storage: new FakeStorage() });
+
+    node._storage.createReadStream = function() {
+      return stream;
+    };
+
+    it('should replicate the item it did not publish after T_EXPIRE', function(done) {
+      var _put = sinon.stub(node, 'put', function(k, v, cb) {
+        cb(null);
+        _put.restore();
+        stream.removeAllListeners();
+        done();
+      });
+      node._replicate();
+      setImmediate(function() {
+        stream.emit('data', {
+          key: utils.createID('beep'),
+          value: {
+            value: 'boop',
+            timestamp: Date.now() - constants.T_REPUBLISH,
+            publisher: utils.createID('some_other_node_id')
+          }
+        });
+      });
+    });
+
+    it('should replicate the item it did publish after T_REPUBLISH', function(done) {
+      var _put = sinon.stub(node, 'put', function(k, v, cb) {
+        cb(null);
+        _put.restore();
+        done();
+      });
+      node._replicate();
+      setImmediate(function() {
+        stream.emit('data', {
+          key: utils.createID('beep'),
+          value: {
+            value: 'boop',
+            timestamp: Date.now() - constants.T_REPUBLISH,
+            publisher: node._self.nodeID
+          }
+        });
+      });
+    });
+
+    it('should call the error handler', function(done) {
+      var _error = sinon.stub(node._log, 'error', function() {
+        _error.restore();
+        done();
+      });
+      stream.emit('error', new Error());
+    });
+
+    it('should call the end handler', function(done) {
+      var _info = sinon.stub(node._log, 'info', function() {
+        _info.restore();
+        done();
+      });
+      stream.emit('end');
+    });
+
+  });
+
+  describe('#_expire', function() {
+
+    var stream = new EventEmitter();
+    var node = Node({ address: '0.0.0.0', port: 65520, storage: new FakeStorage() });
+
+    node._storage.createReadStream = function() {
+      return stream;
+    };
+
+    it('should expire the item after T_EXPIRE', function(done) {
+      var _del = sinon.stub(node._storage, 'del', function(k, cb) {
+        cb(null);
+        _del.restore();
+        done();
+      });
+      node._expire();
+      setImmediate(function() {
+        stream.emit('data', {
+          key: utils.createID('beep'),
+          value: {
+            value: 'boop',
+            timestamp: Date.now(),
+            publisher: utils.createID('some_other_node_id')
+          }
+        });
+        stream.emit('data', {
+          key: utils.createID('beep'),
+          value: {
+            value: 'boop',
+            timestamp: Date.now() - constants.T_EXPIRE,
+            publisher: utils.createID('some_other_node_id')
+          }
+        });
+      });
+    });
+
+    it('should call the error handler', function(done) {
+      var _error = sinon.stub(node._log, 'error', function() {
+        _error.restore();
+        done();
+      });
+      stream.emit('error', new Error());
+    });
+
+    it('should call the end handler', function(done) {
+      var _info = sinon.stub(node._log, 'info', function() {
+        _info.restore();
+        done();
+      });
+      stream.emit('end');
     });
 
   });

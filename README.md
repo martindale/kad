@@ -49,11 +49,38 @@ dht.on('connect', function() {
 Kad does not make assumptions about how your nodes will store their data,
 instead relying on you to implement a storage adapter of your choice. This is
 as simple as providing `get(key, callback)`, `put(key, value, callback)`,
-`del(key, callback)`, `createReadStream()` methods.
+`del(key, callback)`, and `createReadStream()` methods.
 
-This works well with [LevelUp](https://github.com/rvagg/node-levelup), but you
+This works well with [levelup](https://github.com/rvagg/node-levelup), but you
 could conceivably implement any storage layer you like provided you expose the
 interface described above.
+
+## NAT Traversal and Hole Punching
+
+If your program runs on a user's personal computer, it's very likely that you
+will need to forward a port on their router so peers can communicate when
+behind a firewall. This is easy to do, using Indutny's
+[node-nat-upnp](https://github.com/indutny/node-nat-upnp) module.
+
+You'll want to do this *before* instantiating the Kademlia node.
+
+```js
+var nat = require('nat-upnp').createClient();
+var port = 65535;
+
+nat.portMapping({
+  public: port,
+  private: port,
+  ttl: 0 // indefinite lease
+}, function(err) {
+  nat.externalIp(function(err, ip) {
+    kad({ address: ip, port: port, /* ... */ }, function(err) {
+      // ready to go!
+    });
+  });
+});
+```
+
 
 ## License
 
