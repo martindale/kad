@@ -17,7 +17,6 @@ var Node = require('./lib/node');
 module.exports = function createNode(options, onConnect) {
   if (options.seeds) {
     assert(Array.isArray(options.seeds), 'Invalid `options.seeds` supplied');
-    assert(options.seeds.length > 0, 'You must supply at least one seed');
   } else {
     options.seeds = [];
   }
