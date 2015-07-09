@@ -44,6 +44,22 @@ dht.on('connect', function() {
 });
 ```
 
+## Transports
+
+By default, Kad uses UDP to facilitate communication between nodes, however it
+is possible to use a different transport. Kad ships with support for *both* 
+UDP and TCP transports. To explicitly define the transport to use, set the 
+`transport` option to the appropriate value.
+
+```js
+var dht = kademlia({
+  // ...
+  transport: kademlia.transports.TCP // defaults to `kademlia.transports.UDP`
+});
+```
+
+Implementing other transports should be possible. Pull requests welcome!
+
 ## Persistence
 
 Kad does not make assumptions about how your nodes will store their data,

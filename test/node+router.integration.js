@@ -6,6 +6,7 @@ var constants = require('../lib/constants');
 var Node = require('../lib/node');
 var Contact = require('../lib/contact');
 var Bucket = require('../lib/bucket');
+var transports = require('../lib/transports');
 
 function FakeStorage() {
   this.data = {};
@@ -33,30 +34,57 @@ FakeStorage.prototype.createReadStream = function() {
 var storage1 = new FakeStorage();
 var storage2 = new FakeStorage();
 var storage3 = new FakeStorage();
+var storage4 = new FakeStorage();
+var storage5 = new FakeStorage();
+var storage6 = new FakeStorage();
 
 var node1;
 var node2;
 var node3;
+var node4;
+var node5;
+var node6;
 
 var logLevel = Number(process.env.LOG_LEVEL);
 
 var node1opts = {
   address: '127.0.0.1',
-  port: 65533,
+  port: 65520,
   storage: storage1,
   logLevel: logLevel
 };
 var node2opts = {
   address: '127.0.0.1',
-  port: 65534,
+  port: 65521,
   storage: storage2,
   logLevel: logLevel
 };
 var node3opts = {
   address: '127.0.0.1',
-  port: 65535,
+  port: 65522,
   storage: storage3,
   logLevel: logLevel
+};
+var node4opts = {
+  address: '127.0.0.1',
+  port: 65523,
+  storage: storage4,
+  logLevel: logLevel,
+  transport: transports.TCP
+};
+var node5opts = {
+  address: '127.0.0.1',
+  port: 65524,
+  storage: storage5,
+  logLevel: logLevel,
+  transport: transports.TCP
+};
+var node6opts = {
+  address: '127.0.0.1',
+  port: 65525,
+  storage: storage6,
+  logLevel: logLevel,
+  transport: transports.TCP
 };
 
 describe('Node+Router', function() {
@@ -95,24 +123,48 @@ describe('Node+Router', function() {
     node1 = Node(node1opts);
     node2 = Node(node2opts);
     node3 = Node(node3opts);
+    node4 = Node(node4opts);
+    node5 = Node(node5opts);
+    node6 = Node(node6opts);
 
-    it('should connect node2 to node1', function(done) {
+    it('should connect node2 to node1 over udp', function(done) {
       node2.connect('127.0.0.1', node1opts.port, function() {
         expect(Object.keys(node2._buckets)).to.have.lengthOf(1);
         done();
       });
     });
 
-    it('should connect node3 to node2', function(done) {
+    it('should connect node5 to node4 over tcp', function(done) {
+      node5.connect('127.0.0.1', node4opts.port, function() {
+        expect(Object.keys(node5._buckets)).to.have.lengthOf(1);
+        done();
+      });
+    });
+
+    it('should connect node3 to node2 over udp', function(done) {
       node3.connect('127.0.0.1', node2opts.port, function() {
         expect(Object.keys(node3._buckets)).to.have.lengthOf(2);
         done();
       });
     });
 
-    it('should connect node1 to node3', function(done) {
+    it('should connect node6 to node5 over tcp', function(done) {
+      node6.connect('127.0.0.1', node5opts.port, function() {
+        expect(Object.keys(node6._buckets)).to.have.lengthOf(2);
+        done();
+      });
+    });
+
+    it('should connect node1 to node3 over udp', function(done) {
       node1.connect('127.0.0.1', node3opts.port, function() {
-        expect(Object.keys(node1._buckets)).to.have.lengthOf(2);
+        expect(Object.keys(node1._buckets)).to.have.lengthOf(1);
+        done();
+      });
+    });
+
+    it('should connect node4 to node6 over tcp', function(done) {
+      node4.connect('127.0.0.1', node6opts.port, function() {
+        expect(Object.keys(node1._buckets)).to.have.lengthOf(1);
         done();
       });
     });

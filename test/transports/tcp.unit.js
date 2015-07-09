@@ -2,12 +2,12 @@
 
 var expect = require('chai').expect;
 var sinon = require('sinon');
-var constants = require('../lib/constants');
-var RPC = require('../lib/rpc');
-var Contact = require('../lib/contact');
-var Message = require('../lib/message');
+var constants = require('../../lib/constants');
+var RPC = require('../../lib/transports/tcp');
+var Contact = require('../../lib/contact');
+var Message = require('../../lib/message');
 
-describe('RPC', function() {
+describe('Transports/TCP', function() {
 
   describe('@constructor', function() {
 
@@ -113,10 +113,8 @@ describe('RPC', function() {
       var contact = new Contact('0.0.0.0', 0);
       var rpc = new RPC(contact);
       rpc.on('ready', function() {
-        expect(rpc._socket._receiving).to.equal(true);
+        rpc._socket.on('close', done);
         rpc.close();
-        expect(rpc._socket._receiving).to.equal(false);
-        done();
       });
     });
 
