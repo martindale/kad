@@ -53,22 +53,6 @@ describe('Node', function() {
   describe('#_updateContact', function() {
 
     it('should ping the contact at bucket head if bucket is full', function(done) {
-      this.timeout(5000);
-      var node = Node({ address: '0.0.0.0', port: 65527, storage: new FakeStorage() });
-      var contact = new Contact('127.0.0.1', 1234);
-      var counter = 0;
-      node._buckets[159] = new Bucket();
-      for (var i = 0; i < constants.B; i++) {
-        node._buckets[159].addContact(Contact('127.0.0.1', counter));
-        counter++;
-      }
-      node._updateContact(contact, function() {
-        expect(node._buckets[159].hasContact(contact.nodeID)).to.equal(true);
-        done();
-      });
-    });
-
-    it('should ping the contact at bucket head if bucket is full', function(done) {
       var node = Node({ address: '0.0.0.0', port: 65527, storage: new FakeStorage() });
       var contact = new Contact('127.0.0.1', 1234);
       var _send = sinon.stub(node._rpc, 'send', function(c, m, cb) {
