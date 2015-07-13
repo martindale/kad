@@ -149,7 +149,7 @@ describe('Transports/TCP', function() {
         expect(typeof data).to.equal('object');
         done();
       });
-      rpc._handleMessage(validMsg1, {});
+      rpc._handleMessage(validMsg1, { address: '127.0.0.1', port: 1234 });
     });
 
     it('should call the message callback if a reply', function(done) {
@@ -160,7 +160,7 @@ describe('Transports/TCP', function() {
           done();
         }
       }
-      rpc._handleMessage(validMsg2, {});
+      rpc._handleMessage(validMsg2, { address: '127.0.0.1', port: 1234 });
     });
 
   });

@@ -1,6 +1,6 @@
 {
   "name": "kad",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "implementation of the kademlia dht for node",
   "main": "index.js",
   "directories": {
@@ -23,6 +23,7 @@
   "license": "GPLv3",
   "dependencies": {
     "async": "^0.9.0",
+    "clarinet": "^0.11.0",
     "colors": "^1.0.3",
     "hat": "0.0.3",
     "lodash": "^3.6.0",
