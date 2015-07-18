@@ -164,7 +164,7 @@ describe('Node+Router', function() {
 
     it('should connect node4 to node6 over tcp', function(done) {
       node4.connect('127.0.0.1', node6opts.port, function() {
-        expect(Object.keys(node1._buckets)).to.have.lengthOf(1);
+        expect(Object.keys(node4._buckets)).to.have.lengthOf(1);
         done();
       });
     });
