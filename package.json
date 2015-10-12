@@ -1,6 +1,6 @@
 {
   "name": "kad",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "implementation of the kademlia dht for node",
   "main": "index.js",
   "directories": {
@@ -23,6 +23,12 @@
     "url": "https://gitlab.com/gordonhall/kad.git"
   },
   "author": "Gordon Hall <gordon@gordonwritescode.com>",
+  "contributors": [
+    {
+      "name": "omphalos",
+      "url": "https://github.com/omphalos"
+    }
+  ],
   "license": "GPLv3",
   "dependencies": {
     "async": "^0.9.0",
