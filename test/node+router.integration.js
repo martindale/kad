@@ -1,12 +1,14 @@
 'use strict';
 
 var expect = require('chai').expect;
+var EventEmitter = require('events').EventEmitter;
 var sinon = require('sinon');
 var constants = require('../lib/constants');
 var Node = require('../lib/node');
 var Contact = require('../lib/contact');
 var Bucket = require('../lib/bucket');
 var transports = require('../lib/transports');
+var wrtc = require('wrtc');
 
 function FakeStorage() {
   this.data = {};
@@ -37,6 +39,9 @@ var storage3 = new FakeStorage();
 var storage4 = new FakeStorage();
 var storage5 = new FakeStorage();
 var storage6 = new FakeStorage();
+var storage7 = new FakeStorage();
+var storage8 = new FakeStorage();
+var storage9 = new FakeStorage();
 
 var node1;
 var node2;
@@ -44,6 +49,10 @@ var node3;
 var node4;
 var node5;
 var node6;
+var node7;
+var node8;
+var node9;
+var signaller = new EventEmitter();
 
 var logLevel = Number(process.env.LOG_LEVEL);
 
@@ -86,6 +95,30 @@ var node6opts = {
   logLevel: logLevel,
   transport: transports.TCP
 };
+var node7opts = {
+  nick: '65523',
+  storage: storage7,
+  logLevel: logLevel,
+  signaller: signaller,
+  transport: transports.WebRTC,
+  wrtc: wrtc
+};
+var node8opts = {
+  nick: '65524',
+  storage: storage8,
+  logLevel: logLevel,
+  signaller: signaller,
+  transport: transports.WebRTC,
+  wrtc: wrtc
+};
+var node9opts = {
+  nick: '65525',
+  storage: storage9,
+  logLevel: logLevel,
+  signaller: signaller,
+  transport: transports.WebRTC,
+  wrtc: wrtc
+};
 
 describe('Node+Router', function() {
 
@@ -126,45 +159,72 @@ describe('Node+Router', function() {
     node4 = Node(node4opts);
     node5 = Node(node5opts);
     node6 = Node(node6opts);
+    node7 = Node(node7opts);
+    node8 = Node(node8opts);
+    node9 = Node(node9opts);
 
     it('should connect node2 to node1 over udp', function(done) {
-      node2.connect('127.0.0.1', node1opts.port, function() {
+      node2.connect(node1opts, function() {
         expect(Object.keys(node2._buckets)).to.have.lengthOf(1);
         done();
       });
     });
 
     it('should connect node5 to node4 over tcp', function(done) {
-      node5.connect('127.0.0.1', node4opts.port, function() {
+      node5.connect(node4opts, function() {
         expect(Object.keys(node5._buckets)).to.have.lengthOf(1);
         done();
       });
     });
 
+    it('should connect node8 to node7 over webrtc', function(done) {
+      this.timeout(5000);
+      node8.connect(node7opts, function() {
+        expect(Object.keys(node8._buckets)).to.have.lengthOf(1);
+        done();
+      });
+    });
+
     it('should connect node3 to node2 over udp', function(done) {
-      node3.connect('127.0.0.1', node2opts.port, function() {
+      node3.connect(node2opts, function() {
         expect(Object.keys(node3._buckets)).to.have.lengthOf(2);
         done();
       });
     });
 
     it('should connect node6 to node5 over tcp', function(done) {
-      node6.connect('127.0.0.1', node5opts.port, function() {
+      node6.connect(node5opts, function() {
         expect(Object.keys(node6._buckets)).to.have.lengthOf(2);
         done();
       });
     });
 
+    it('should connect node9 to node8 over webrtc', function(done) {
+      this.timeout(5000);
+      node9.connect(node8opts, function() {
+        expect(Object.keys(node9._buckets)).to.have.lengthOf(2);
+        done();
+      });
+    });
+
     it('should connect node1 to node3 over udp', function(done) {
-      node1.connect('127.0.0.1', node3opts.port, function() {
+      node1.connect(node3opts, function() {
         expect(Object.keys(node1._buckets)).to.have.lengthOf(1);
         done();
       });
     });
 
     it('should connect node4 to node6 over tcp', function(done) {
-      node4.connect('127.0.0.1', node6opts.port, function() {
+      node4.connect(node6opts, function() {
         expect(Object.keys(node4._buckets)).to.have.lengthOf(1);
+        done();
+      });
+    });
+
+    it('should connect node7 to node9 over webrtc', function(done) {
+      this.timeout(5000);
+      node7.connect(node9opts, function() {
+        expect(Object.keys(node7._buckets)).to.have.lengthOf(1);
         done();
       });
     });
@@ -174,7 +234,7 @@ describe('Node+Router', function() {
       var _findNode = sinon.stub(node, '_findNode', function(id, cb) {
         return cb(new Error('fatal error'));
       });
-      node.connect('127.0.0.1', 3333, function(err) {
+      node.connect({ address: '127.0.0.1', port: 3333 }, function(err) {
         expect(err.message).to.equal('fatal error');
         _findNode.restore();
         done();
@@ -191,7 +251,7 @@ describe('Node+Router', function() {
         _findNode.restore();
         done();
       });
-      node.connect('127.0.0.1', 3333);
+      node.connect({ address: '127.0.0.1', port: 3333 });
     });
 
   });

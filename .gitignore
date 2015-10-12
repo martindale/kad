@@ -28,3 +28,8 @@ node_modules
 
 # local playground
 sandbox
+
+# Example artifacts
+index.browser.js
+node1
+node2

@@ -23,9 +23,6 @@ module.exports = function createNode(options, onConnect) {
 
   for (var i = 0; i < options.seeds.length; i++) {
     var seed = options.seeds[i];
-
-    assert(typeof seed.address === 'string', 'Invalid seed address');
-    assert(typeof seed.port === 'number', 'Invalid seed port');
   }
 
   var node = new Node(options);
@@ -33,7 +30,7 @@ module.exports = function createNode(options, onConnect) {
   async.eachSeries(options.seeds, connectToSeed, onConnect);
 
   function connectToSeed(seed, done) {
-    node.connect(seed.address, seed.port, done);
+    node.connect(seed, done);
   }
 
   return node;

@@ -8,7 +8,10 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha test/** --recursive",
-    "coverage": "./node_modules/.bin/istanbul cover -x 'lib/logger.js' ./node_modules/.bin/_mocha -- --recursive"
+    "coverage": "./node_modules/.bin/istanbul cover -x 'lib/logger.js' ./node_modules/.bin/_mocha -- --recursive",
+    "build-webrtc-browser": "./node_modules/.bin/browserify examples/webrtc-browser/index.js > examples/webrtc-browser/index.browser.js",
+    "build-webrtc-browser-e2e": "./node_modules/.bin/browserify examples/webrtc-browser-e2e/index.js > examples/webrtc-browser-e2e/index.browser.js",
+    "build-examples": "npm run build-webrtc-browser && npm run build-webrtc-browser-e2e"
   },
   "keywords": [
     "dht",
@@ -28,14 +31,23 @@
     "hat": "0.0.3",
     "lodash": "^3.6.0",
     "merge": "^1.2.0",
-    "ms": "^0.7.0"
+    "ms": "^0.7.0",
+    "simple-peer": "^5.11.5"
   },
   "devDependencies": {
+    "browserify": "^11.1.0",
     "chai": "^2.2.0",
     "coveralls": "^2.11.2",
     "faker": "^2.1.2",
     "istanbul": "^0.3.13",
     "mocha": "^2.2.4",
     "sinon": "^1.14.1"
+  },
+  "optionalDependencies": {
+    "kad-localstorage": "0.0.4",
+    "leveldown": "^1.4.1",
+    "levelup": "^1.2.1",
+    "wrtc": "0.0.58",
+    "ws": "^0.8.0"
   }
 }
