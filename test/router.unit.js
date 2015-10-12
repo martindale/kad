@@ -5,7 +5,7 @@ var sinon = require('sinon');
 var utils = require('../lib/utils');
 var constants = require('../lib/constants');
 var Router = require('../lib/router');
-var Contact = require('../lib/contact');
+var AddressPortContact = require('../lib/transports/address-port-contact');
 var Node = require('../lib/node');
 
 function FakeStorage() {
@@ -44,7 +44,7 @@ describe('Router', function() {
       var _rpc = sinon.stub(router.node._rpc, 'send', function(c, m, d) {
         d(new Error());
       });
-      var contact = new Contact('0.0.0.0', 1234);
+      var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
       router.shortlist.push(contact);
       router._queryContact(contact, function() {
         expect(router.shortlist).to.have.lengthOf(0);
@@ -63,7 +63,7 @@ describe('Router', function() {
         port: 0,
         storage: new FakeStorage()
       }));
-      var contact = new Contact('0.0.0.0', 1234);
+      var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
       router.shortlist.push(contact);
       router.closestNodeDistance = '00000000000000000001';
       router._handleFindResult({
@@ -85,7 +85,7 @@ describe('Router', function() {
         port: 0,
         storage: new FakeStorage()
       }));
-      var contact = new Contact('0.0.0.0', 1234);
+      var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
       router.shortlist = new Array(constants.K);
       router._handleQueryResults(function(err, type, contacts) {
         expect(contacts).to.equal(router.shortlist);
@@ -104,8 +104,8 @@ describe('Router', function() {
         storage: new FakeStorage()
       }));
       var _send = sinon.stub(router.node._rpc, 'send');
-      var contact1 = new Contact('0.0.0.0', 1234);
-      var contact2 = new Contact('0.0.0.0', 1235);
+      var contact1 = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
+      var contact2 = new AddressPortContact({ address: '0.0.0.0', port: 1235 });
       router.contactsWithoutValue = [contact1, contact2];
       router._handleValueReturned(function(err, type, contacts) {
         expect(_send.callCount).to.equal(1);

@@ -3,13 +3,13 @@
 var expect = require('chai').expect;
 var constants = require('../lib/constants');
 var Message = require('../lib/message');
-var Contact = require('../lib/contact');
+var AddressPortContact = require('../lib/transports/address-port-contact');
 
 describe('Message', function() {
 
   describe('@constructor', function() {
 
-    var contact = new Contact('0.0.0.0', 1337);
+    var contact = new AddressPortContact({ address: '0.0.0.0', port: 1337 });
 
     it('should create an instance with the `new` keyword', function() {
       expect(new Message('PING', {}, contact)).to.be.instanceOf(Message);
@@ -35,7 +35,7 @@ describe('Message', function() {
 
   describe('#serialize', function() {
 
-    var contact = new Contact('0.0.0.0', 1337);
+    var contact = new AddressPortContact({ address: '0.0.0.0', port: 1337 });
 
     it('should return a buffer ready for sending', function() {
       var msg = new Message('PING', {}, contact);

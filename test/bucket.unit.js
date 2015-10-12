@@ -2,7 +2,7 @@
 
 var expect = require('chai').expect;
 var Bucket = require('../lib/bucket');
-var Contact = require('../lib/contact');
+var AddressPortContact = require('../lib/transports/address-port-contact');
 
 describe('Bucket', function() {
 
@@ -71,7 +71,7 @@ describe('Bucket', function() {
   describe('#addContact', function() {
 
     var bucket = new Bucket();
-    var contact = new Contact('0.0.0.0', 1337);
+    var contact = new AddressPortContact({ address: '0.0.0.0', port: 1337 });
 
     it('should add the contact to the bucket', function() {
       expect(bucket.getSize()).to.equal(0);
@@ -97,13 +97,15 @@ describe('Bucket', function() {
   describe('#removeContact', function() {
 
     var bucket = new Bucket();
-    bucket.addContact(new Contact('0.0.0.0', 1337));
-    bucket.addContact(new Contact('0.0.0.1', 1337));
-    bucket.addContact(new Contact('0.0.0.2', 1337));
+
+    bucket.addContact(AddressPortContact({ address: '0.0.0.0', port: 1337 }));
+    bucket.addContact(AddressPortContact({ address: '0.0.0.1', port: 1337 }));
+    bucket.addContact(AddressPortContact({ address: '0.0.0.2', port: 1337 }));
 
     it('should remove the given contact', function() {
       expect(bucket.getSize()).to.equal(3);
-      bucket.removeContact(new Contact('0.0.0.0', 1337));
+      var contact = AddressPortContact({ address: '0.0.0.0', port: 1337 });
+      bucket.removeContact(contact);
       expect(bucket.getSize()).to.equal(2);
     });
 
@@ -115,7 +117,8 @@ describe('Bucket', function() {
 
     it('should do nothing if contact is not found', function() {
       expect(bucket.getSize()).to.equal(2);
-      bucket.removeContact(new Contact('0.0.0.3', 1337));
+      var contact = AddressPortContact({ address: '0.0.0.3', port: 1337 })
+      bucket.removeContact(contact);
       expect(bucket.getSize()).to.equal(2);
     });
 
@@ -124,28 +127,34 @@ describe('Bucket', function() {
 
   describe('#hasContact', function() {
 
-    var bucket = Bucket().addContact(new Contact('0.0.0.0', 80));
+    var contact = AddressPortContact({ address: '0.0.0.0', port: 80 });
+    var bucket = Bucket().addContact(contact);
 
     it('should return true because the contact exists', function() {
-      expect(bucket.hasContact(Contact('0.0.0.0', 80).nodeID)).to.equal(true);
+      var otherContact = AddressPortContact({ address: '0.0.0.0', port: 80 });
+      expect(bucket.hasContact(otherContact.nodeID)).to.equal(true);
     });
 
-    it('should return true because the contactdoes not exist', function() {
-      expect(bucket.hasContact(Contact('0.0.0.0', 81).nodeID)).to.equal(false);
+    it('should return true because the contact does not exist', function() {
+      var otherContact = AddressPortContact({ address: '0.0.0.0', port: 81 });
+      expect(bucket.hasContact(otherContact.nodeID)).to.equal(false);
     });
 
   });
 
   describe('#indexOf', function() {
 
-    var bucket = Bucket().addContact(Contact('0.0.0.0', 80));
+    var contact = AddressPortContact({ address: '0.0.0.0', port: 80 });
+    var bucket = Bucket().addContact(contact);
 
     it('should return the index of the given contact object', function() {
-      expect(bucket.indexOf(Contact('0.0.0.0', 80))).to.equal(0);
+      var otherContact = AddressPortContact({ address: '0.0.0.0', port: 80 });
+      expect(bucket.indexOf(otherContact)).to.equal(0);
     });
 
     it('should return -1 for the missing contact object', function() {
-      expect(bucket.indexOf(Contact('0.0.0.0', 81))).to.equal(-1);
+      var otherContact = AddressPortContact({ address: '0.0.0.0', port: 81 });
+      expect(bucket.indexOf(otherContact)).to.equal(-1);
     });
 
   });

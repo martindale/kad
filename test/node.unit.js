@@ -5,7 +5,7 @@ var sinon = require('sinon');
 var utils = require('../lib/utils');
 var constants = require('../lib/constants');
 var Node = require('../lib/node');
-var Contact = require('../lib/contact');
+var AddressPortContact = require('../lib/transports/address-port-contact');
 var Bucket = require('../lib/bucket');
 var EventEmitter = require('events').EventEmitter;
 
@@ -54,14 +54,16 @@ describe('Node', function() {
 
     it('should ping the contact at bucket head if bucket is full', function(done) {
       var node = Node({ address: '0.0.0.0', port: 65527, storage: new FakeStorage() });
-      var contact = new Contact('127.0.0.1', 1234);
+      var contact = new AddressPortContact({ address: '127.0.0.1', port: 1234 });
       var _send = sinon.stub(node._rpc, 'send', function(c, m, cb) {
         cb();
       });
       var counter = 0;
+      var bucketContact;
       node._buckets[159] = new Bucket();
       for (var i = 0; i < constants.B; i++) {
-        node._buckets[159].addContact(Contact('127.0.0.1', counter));
+        bucketContact = AddressPortContact({ address: '127.0.0.1', port: counter });
+        node._buckets[159].addContact(bucketContact);
         counter++;
       }
       node._updateContact(contact, function() {
@@ -145,6 +147,17 @@ describe('Node', function() {
       node.get('beep', function(err) {
         expect(err.message).to.equal('Failed for some reason');
         _findValue.restore();
+        done();
+      });
+    });
+
+    it('should return the value in storage', function(done) {
+      var storage = new FakeStorage();
+      var node = Node({ address: '0.0.0.0', port: 65522, storage: storage });
+      storage.data.beep = JSON.stringify({ value: 'boop' });
+      node.get('beep', { hashkey: false }, function(err, val) {
+        expect(err).to.equal(null);
+        expect(val).to.equal('boop');
         done();
       });
     });
