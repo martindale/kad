@@ -62,6 +62,14 @@ describe('Utils', function() {
       )).to.deep.equal(result2);
     });
 
+    it('should throw when keys are invalid', function() {
+      expect(function() {
+        utils.getDistance('bad', 'ffbfba8945192d408d3dcc52ba24903a00000001');
+      }).to.throw(Error);
+      expect(function() {
+        utils.getDistance('ffbfba8945192d408d3dcc52ba24903a00000001', 'bad');
+      }).to.throw(Error);
+    });
   });
 
   describe('#compareKeys', function() {
@@ -121,6 +129,15 @@ describe('Utils', function() {
         var id2 = utils.createID(faker.lorem.sentence());
         expect(utils.getBucketIndex(id1, id2)).to.not.equal(constants.B);
       }
+    });
+
+    it('should throw when key is invalid', function() {
+      expect(function() {
+        utils.getBucketIndex('ffbfba8945192d408d3dcc52ba24903a00000001', 'bad');
+      }).to.throw(Error);
+      expect(function() {
+        utils.getBucketIndex('ffbfba8945192d408d3dcc52ba24903a00000001', 'bad');
+      }).to.throw(Error);
     });
 
   });

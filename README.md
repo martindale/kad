@@ -76,6 +76,26 @@ This works well with [levelup](https://github.com/rvagg/node-levelup), but you
 could conceivably implement any storage layer you like provided you expose the
 interface described above.
 
+## Key-value validation
+
+Optionally you might want to run Kad with key-value validation.
+One use case of this might be content-addressable storage,
+where the key is the hash of the value.
+Another use case is verifying cryptographic signatures,
+where the keys represents the public portion
+of the key pair used to sign the value.
+
+In cases like these, you can pass a `validateKeyValuePair` option:
+
+```js
+var dht = kademlia({
+  // ...
+  validateKeyValuePair: function(key, value, callback) {
+    callback(/* true or false */);
+  }
+});
+```
+
 ## NAT Traversal and Hole Punching
 
 If your program runs on a user's personal computer, it's very likely that you
