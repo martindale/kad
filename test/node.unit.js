@@ -50,6 +50,49 @@ describe('Node', function() {
 
   });
 
+  describe('#_put', function() {
+
+    it('should put a valid key/value pair', function() {
+      var node = Node({ address: '0.0.0.0', port: 65528, storage: new FakeStorage() });
+      var _put = sinon.stub(node, '_putValidatedKeyValue');
+      node.put('key', 'value', function() {});
+      expect(_put.callCount).to.equal(1);
+    });
+
+    it('should send a key/value pair to validator', function(done) {
+      var node = Node({
+        address: '0.0.0.0',
+        port: 65528,
+        storage: new FakeStorage(),
+        validateKeyValuePair: validateKeyValuePair
+      });
+      node.put('key', 'value', function() {});
+
+      function validateKeyValuePair(key, value, callback) {
+        expect(key).to.equal('key');
+        expect(value).to.equal('value');
+        done();
+      }
+    });
+
+    it('should not put an invalid key/value pair', function() {
+      var node = Node({
+        address: '0.0.0.0',
+        port: 65528,
+        storage: new FakeStorage(),
+        validateKeyValuePair: validateKeyValuePair
+      });
+      var _put = sinon.stub(node, '_putValidatedKeyValue');
+      node.put('key', 'value', function() {});
+      expect(_put.callCount).to.equal(0);
+
+      function validateKeyValuePair(key, value, callback) {
+        callback(false);
+      }
+    });
+
+  });
+
   describe('#_updateContact', function() {
 
     it('should ping the contact at bucket head if bucket is full', function(done) {
@@ -95,30 +138,74 @@ describe('Node', function() {
 
   describe('#_handleStore', function() {
 
-    it('should halt if invalid key or no value', function() {
+    it('should halt if invalid key', function() {
       var node = Node({ address: '0.0.0.0', port: 65525, storage: new FakeStorage() });
       var _get = sinon.stub(node._storage, 'get');
-      node._handleStore({ key: 'beep', value: null });
+      node._handleStore({
+        key: 123,
+        value: null,
+        nodeID: utils.createID('publisher')
+      });
       expect(_get.callCount).to.equal(0);
       _get.restore();
+    });
+
+    it('should halt if no value', function() {
+      var node = Node({ address: '0.0.0.0', port: 65525, storage: new FakeStorage() });
+      var _get = sinon.stub(node._storage, 'get');
+      node._handleStore({
+        key: 'beep',
+        value: null,
+        nodeID: utils.createID('publisher')
+      });
+      expect(_get.callCount).to.equal(0);
+    });
+
+    it('should halt if invalid key/value', function() {
+      var node = Node({
+        address: '0.0.0.0',
+        port: 65525,
+        storage: new FakeStorage(),
+        validateKeyValuePair: validateKeyValuePair
+      });
+      var _get = sinon.stub(node._storage, 'get');
+      node._handleStore({
+        key: utils.createID('key'),
+        value: 'value',
+        nodeID: utils.createID('publisher')
+      });
+      expect(_get.callCount).to.equal(0);
+
+      function validateKeyValuePair(key, value, callback) {
+        callback(false);
+      }
+    });
+
+    it('should send key/value pair to validator', function(done) {
+      var node = Node({
+        address: '0.0.0.0',
+        port: 65525,
+        storage: new FakeStorage(),
+        validateKeyValuePair: validateKeyValuePair
+      });
+      var _get = sinon.stub(node._storage, 'get');
+      node._handleStore({
+        key: utils.createID('key'),
+        value: 'value',
+        nodeID: utils.createID('publisher')
+      });
+      expect(_get.callCount).to.equal(0);
+
+      function validateKeyValuePair(key, value, callback) {
+        expect(key).to.equal(utils.createID('key'));
+        expect(value).to.equal('value');
+        done();
+      }
     });
 
   });
 
   describe('#_handleFindValue', function() {
-
-    it('should halt if invalid key', function() {
-      var node = Node({ address: '0.0.0.0', port: 65524, storage: new FakeStorage() });
-      var _get = sinon.stub(node._storage, 'get');
-      node._handleFindValue({
-        key: 'beep',
-        address: '0.0.0.0',
-        port: 1234,
-        nodeID: utils.createID('data')
-      });
-      expect(_get.callCount).to.equal(0);
-      _get.restore();
-    });
 
     it('should send contacts if no value found', function(done) {
       var node = Node({ address: '0.0.0.0', port: 65523, storage: new FakeStorage() });
@@ -155,7 +242,7 @@ describe('Node', function() {
       var storage = new FakeStorage();
       var node = Node({ address: '0.0.0.0', port: 65522, storage: storage });
       storage.data.beep = JSON.stringify({ value: 'boop' });
-      node.get('beep', { hashkey: false }, function(err, val) {
+      node.get('beep', function(err, val) {
         expect(err).to.equal(null);
         expect(val).to.equal('boop');
         done();

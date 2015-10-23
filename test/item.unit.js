@@ -22,9 +22,9 @@ describe('Item', function() {
       ).to.be.instanceOf(Item);
     });
 
-    it('should throw without an valid key', function() {
+    it('should throw with an invalid key', function() {
       expect(function() {
-        new Item('beep', 'boop', publisher)
+        new Item(123, 'boop', publisher)
       }).to.throw(Error);
     });
 
