@@ -48,7 +48,7 @@ dht.on('connect', function() {
 
 By default, Kad uses UDP to facilitate communication between nodes, however it
 is possible to use a different transport.
-Kad ships with support for UDP, TCP, and WebRTC transports.
+Kad ships with support for UDP, TCP, HTTP, and WebRTC transports.
 To explicitly define the transport to use, set the
 `transport` option to the appropriate value.
 
