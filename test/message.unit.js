@@ -3,7 +3,7 @@
 var expect = require('chai').expect;
 var constants = require('../lib/constants');
 var Message = require('../lib/message');
-var AddressPortContact = require('../lib/transports/address-port-contact');
+var AddressPortContact = require('../lib/contacts/address-port-contact');
 
 describe('Message', function() {
 

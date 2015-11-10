@@ -5,7 +5,7 @@ var sinon = require('sinon');
 var utils = require('../lib/utils');
 var constants = require('../lib/constants');
 var Node = require('../lib/node');
-var AddressPortContact = require('../lib/transports/address-port-contact');
+var AddressPortContact = require('../lib/contacts/address-port-contact');
 var Bucket = require('../lib/bucket');
 var EventEmitter = require('events').EventEmitter;
 

@@ -4,7 +4,7 @@ var expect = require('chai').expect;
 var sinon = require('sinon');
 var constants = require('../../lib/constants');
 var RPC = require('../../lib/transports/udp');
-var AddressPortContact = require('../../lib/transports/address-port-contact');
+var AddressPortContact = require('../../lib/contacts/address-port-contact');
 var Message = require('../../lib/message');
 
 describe('Transports/UDP', function() {

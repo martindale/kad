@@ -42,6 +42,8 @@ var storage6 = new FakeStorage();
 var storage7 = new FakeStorage();
 var storage8 = new FakeStorage();
 var storage9 = new FakeStorage();
+var storage10 = new FakeStorage();
+var storage11 = new FakeStorage();
 
 var node1;
 var node2;
@@ -52,6 +54,8 @@ var node6;
 var node7;
 var node8;
 var node9;
+var node10;
+var node11;
 var signaller = new EventEmitter();
 
 var logLevel = Number(process.env.LOG_LEVEL);
@@ -119,6 +123,20 @@ var node9opts = {
   transport: transports.WebRTC,
   wrtc: wrtc
 };
+var node10opts = {
+  address: '127.0.0.1',
+  port: 30000,
+  storage: storage10,
+  logLevel: logLevel,
+  transport: transports.HTTP
+};
+var node11opts = {
+  address: '127.0.0.1',
+  port: 30001,
+  storage: storage11,
+  logLevel: logLevel,
+  transport: transports.HTTP
+};
 
 describe('Node+Router', function() {
 
@@ -162,6 +180,8 @@ describe('Node+Router', function() {
     node7 = Node(node7opts);
     node8 = Node(node8opts);
     node9 = Node(node9opts);
+    node10 = Node(node10opts);
+    node11 = Node(node11opts);
 
     it('should connect node2 to node1 over udp', function(done) {
       node2.connect(node1opts, function() {
@@ -225,6 +245,13 @@ describe('Node+Router', function() {
       this.timeout(5000);
       node7.connect(node9opts, function() {
         expect(Object.keys(node7._buckets)).to.have.lengthOf(1);
+        done();
+      });
+    });
+
+    it('should connect node10 to node11 over http', function(done) {
+      node10.connect(node11opts, function() {
+        expect(Object.keys(node10._buckets)).to.have.lengthOf(1);
         done();
       });
     });

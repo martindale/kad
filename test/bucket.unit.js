@@ -2,7 +2,7 @@
 
 var expect = require('chai').expect;
 var Bucket = require('../lib/bucket');
-var AddressPortContact = require('../lib/transports/address-port-contact');
+var AddressPortContact = require('../lib/contacts/address-port-contact');
 
 describe('Bucket', function() {
 

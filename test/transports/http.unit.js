@@ -3,11 +3,11 @@
 var expect = require('chai').expect;
 var sinon = require('sinon');
 var constants = require('../../lib/constants');
-var RPC = require('../../lib/transports/tcp');
+var RPC = require('../../lib/transports/http');
 var AddressPortContact = require('../../lib/contacts/address-port-contact');
 var Message = require('../../lib/message');
 
-describe('Transports/TCP', function() {
+describe('Transports/HTTP', function() {
 
   describe('@constructor', function() {
 
@@ -27,8 +27,8 @@ describe('Transports/TCP', function() {
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 0 });
       var rpc = RPC(contact);
       rpc.on('ready', function() {
-        expect(rpc._socket.address().address).to.equal('0.0.0.0');
-        expect(typeof rpc._socket.address().port).to.equal('number');
+        expect(rpc._server.address().address).to.equal('0.0.0.0');
+        expect(typeof rpc._server.address().port).to.equal('number');
         done();
       });
     });
@@ -84,8 +84,8 @@ describe('Transports/TCP', function() {
     });
 
     it('should send a message and create a response handler', function() {
-      var addr1 = rpc1._socket.address();
-      var addr2 = rpc2._socket.address();
+      var addr1 = rpc1._server.address();
+      var addr2 = rpc2._server.address();
       var contactRpc1 = new AddressPortContact(addr1);
       var contactRpc2 = new AddressPortContact(addr2);
       var msg = new Message('PING', {}, contactRpc1);
@@ -97,8 +97,8 @@ describe('Transports/TCP', function() {
     });
 
     it('should send a message and forget it', function() {
-      var addr1 = rpc1._socket.address();
-      var addr2 = rpc2._socket.address();
+      var addr1 = rpc1._server.address();
+      var addr2 = rpc2._server.address();
       var contactRpc1 = new AddressPortContact(addr1);
       var contactRpc2 = new AddressPortContact(addr2);
       var msg = new Message('PING', {}, contactRpc1);
@@ -115,8 +115,10 @@ describe('Transports/TCP', function() {
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 0 });
       var rpc = new RPC(contact);
       rpc.on('ready', function() {
-        rpc._socket.on('close', done);
+        expect(!!rpc._server._handle).to.equal(true);
         rpc.close();
+        expect(rpc._server._handle).to.equal(null);
+        done();
       });
     });
 

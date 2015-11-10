@@ -1,6 +1,6 @@
 {
   "name": "kad",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "implementation of the kademlia dht for node",
   "main": "index.js",
   "directories": {
@@ -29,7 +29,10 @@
       "url": "https://github.com/omphalos"
     }
   ],
-  "license": "GPLv3",
+  "license": "GPL-3.0",
+  "engines": { 
+    "node" : "0.12.x" 
+  },
   "dependencies": {
     "async": "^0.9.0",
     "clarinet": "^0.11.0",
@@ -53,7 +56,7 @@
     "kad-localstorage": "0.0.4",
     "leveldown": "^1.4.1",
     "levelup": "^1.2.1",
-    "wrtc": "0.0.58",
+    "wrtc": "0.0.59",
     "ws": "^0.8.0"
   }
 }

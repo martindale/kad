@@ -6,7 +6,7 @@ var utils = require('../lib/utils');
 var constants = require('../lib/constants');
 var Router = require('../lib/router');
 var Item = require('../lib/item');
-var AddressPortContact = require('../lib/transports/address-port-contact');
+var AddressPortContact = require('../lib/contacts/address-port-contact');
 var Node = require('../lib/node');
 
 function FakeStorage() {
