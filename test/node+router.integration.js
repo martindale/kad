@@ -293,6 +293,13 @@ describe('Node+Router', function() {
       });
     });
 
+    it('should succeed in setting the value to the dht', function(done) {
+      node10.put('beep', 'boop', function(err) {
+        expect(err).to.not.be.ok;
+        done();
+      });
+    });
+
     it('should pass an error to the callback if failed', function(done) {
       var _set = sinon.stub(node2, 'put', function(k, v, cb) {
         cb(new Error('fail'));
@@ -318,6 +325,14 @@ describe('Node+Router', function() {
 
     it('should succeed in getting the value from the dht', function(done) {
       node1.get('beep', function(err, value) {
+        expect(err).to.equal(null);
+        expect(value).to.equal('boop');
+        done();
+      });
+    });
+
+    it('should succeed in getting the value from the dht', function(done) {
+      node10.get('beep', function(err, value) {
         expect(err).to.equal(null);
         expect(value).to.equal('boop');
         done();
