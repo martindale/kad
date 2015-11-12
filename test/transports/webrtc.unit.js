@@ -182,12 +182,6 @@ describe('Transports/WebRTC', function() {
       rpc2.close();
     });
 
-    it('should throw with invalid contact', function() {
-      expect(function() {
-        rpc1.send(25);
-      }).to.throw(Error, 'Invalid contact supplied');
-    });
-
     it('should throw with invalid message', function() {
       var contact = new WebRTCContact({ nick: 'b' });
       expect(function() {

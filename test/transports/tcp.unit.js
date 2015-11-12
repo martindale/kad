@@ -70,12 +70,6 @@ describe('Transports/TCP', function() {
       rpc2.close();
     });
 
-    it('should throw with invalid contact', function() {
-      expect(function() {
-        rpc1.send({ address: '0.0.0.0' });
-      }).to.throw(Error, 'Invalid contact supplied');
-    });
-
     it('should throw with invalid message', function() {
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
       expect(function() {
