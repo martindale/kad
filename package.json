@@ -12,7 +12,7 @@
     "build-webrtc-browser": "./node_modules/.bin/browserify examples/webrtc-browser/index.js > examples/webrtc-browser/index.browser.js",
     "build-webrtc-browser-e2e": "./node_modules/.bin/browserify examples/webrtc-browser-e2e/index.js > examples/webrtc-browser-e2e/index.browser.js",
     "build-examples": "npm run build-webrtc-browser && npm run build-webrtc-browser-e2e",
-    "browser-bundle": "./node_modules/.bin/browserify index.js > dist/kad.browser.js"
+    "browser-bundle": "./node_modules/.bin/browserify index.js -s kad -o dist/kad.browser.js"
   },
   "keywords": [
     "dht",
