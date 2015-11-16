@@ -28,6 +28,7 @@ node_modules
 
 # local playground
 sandbox
+dist/*.js
 
 # Example artifacts
 index.browser.js

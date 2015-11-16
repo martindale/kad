@@ -100,7 +100,7 @@ describe('Router', function() {
         address: '127.0.0.1',
         port: 0,
         storage: new FakeStorage(),
-        validateKeyValuePair: validateKeyValuePair
+        validate: validateKeyValuePair
       });
       var router = new Router('VALUE', utils.createID('foo'), node);
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
@@ -127,7 +127,7 @@ describe('Router', function() {
         address: '127.0.0.1',
         port: 0,
         storage: new FakeStorage(),
-        validateKeyValuePair: validateKeyValuePair
+        validate: validateKeyValuePair
       });
       var itemKey = utils.createID('beep');
       var publisherKey = utils.createID('publisher');

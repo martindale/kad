@@ -64,7 +64,7 @@ describe('Node', function() {
         address: '0.0.0.0',
         port: 65528,
         storage: new FakeStorage(),
-        validateKeyValuePair: validateKeyValuePair
+        validate: validateKeyValuePair
       });
       node.put('key', 'value', function() {});
 
@@ -80,7 +80,7 @@ describe('Node', function() {
         address: '0.0.0.0',
         port: 65528,
         storage: new FakeStorage(),
-        validateKeyValuePair: validateKeyValuePair
+        validate: validateKeyValuePair
       });
       var _put = sinon.stub(node, '_putValidatedKeyValue');
       node.put('key', 'value', function() {});
@@ -166,7 +166,7 @@ describe('Node', function() {
         address: '0.0.0.0',
         port: 65525,
         storage: new FakeStorage(),
-        validateKeyValuePair: validateKeyValuePair
+        validate: validateKeyValuePair
       });
       var _get = sinon.stub(node._storage, 'get');
       node._handleStore({
@@ -186,7 +186,7 @@ describe('Node', function() {
         address: '0.0.0.0',
         port: 65525,
         storage: new FakeStorage(),
-        validateKeyValuePair: validateKeyValuePair
+        validate: validateKeyValuePair
       });
       var _get = sinon.stub(node._storage, 'get');
       node._handleStore({

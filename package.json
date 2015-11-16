@@ -1,6 +1,6 @@
 {
   "name": "kad",
-  "version": "0.8.4",
+  "version": "0.9.0",
   "description": "implementation of the kademlia dht for node",
   "main": "index.js",
   "directories": {
@@ -11,7 +11,8 @@
     "coverage": "./node_modules/.bin/istanbul cover -x 'lib/logger.js' ./node_modules/.bin/_mocha -- --recursive",
     "build-webrtc-browser": "./node_modules/.bin/browserify examples/webrtc-browser/index.js > examples/webrtc-browser/index.browser.js",
     "build-webrtc-browser-e2e": "./node_modules/.bin/browserify examples/webrtc-browser-e2e/index.js > examples/webrtc-browser-e2e/index.browser.js",
-    "build-examples": "npm run build-webrtc-browser && npm run build-webrtc-browser-e2e"
+    "build-examples": "npm run build-webrtc-browser && npm run build-webrtc-browser-e2e",
+    "browser-bundle": "./node_modules/.bin/browserify index.js > dist/kad.browser.js"
   },
   "keywords": [
     "dht",
