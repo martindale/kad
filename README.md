@@ -52,6 +52,7 @@ Below, we've included a complete list of all properties that can be passed to
 * **seeds** - _optional_: an array of `Contact` objects; depends on the `Transport` adapter, see [Transports](#Transports).
 * **validate** - _optional_: function for validating key/value pairs, see [Validation](#Validation).
 * **transport** - _optional_: constructor function for the transport adapter to be used; defaults to `kad.transports.UDP`.
+* **replyto** - _optional_: provide different addressing information to peers
 * **logLevel** - _optional_: number indicating log verbosity; see [Logging](#Logging).
 * **address** - _optional_: hostname or IP address of this node; used by `UDP`, `TCP`, and `HTTP` transport adapters.
 * **port** - _optional_: port to listen on; used by `UDP`, `TCP`, and `HTTP` transport adapters.
@@ -79,6 +80,33 @@ var dht = kademlia({
 You can see examples of the WebRTC transport in the
 [examples](https://github.com/gordonwritescode/kad/tree/master/examples)
 directory.
+
+### Contacts
+
+Node provide each other with "contact" information which indicates how others
+should communicate with them. By default, this information is automatically
+provided based on the options provided to the transport adapter, like `address`
+and `port`.
+
+However, in some situations, the information provided to the transport adapter
+is not the same information that other nodes need to communicate back. In these
+cases you can provide a `replyto` option and provide the overrides needed.
+
+For example, you may want to listen on all interfaces, but provide a domain
+name to peers:
+
+```js
+var dht = kademlia({
+  // ...
+  address: '0.0.0.0',
+  port: 443,
+  replyto: {
+    address: 'mydomain.tld',
+    port: 443
+  },
+  // ...
+});
+```
 
 ### Custom Transport Adapters
 
