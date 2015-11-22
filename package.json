@@ -1,6 +1,6 @@
 {
   "name": "kad",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "implementation of the kademlia dht for node",
   "main": "index.js",
   "directories": {
