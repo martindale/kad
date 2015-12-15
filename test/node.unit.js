@@ -8,6 +8,7 @@ var Node = require('../lib/node');
 var AddressPortContact = require('../lib/contacts/address-port-contact');
 var Bucket = require('../lib/bucket');
 var EventEmitter = require('events').EventEmitter;
+var Logger = require('../lib/logger');
 
 function FakeStorage() {
   this.data = {};
@@ -37,7 +38,7 @@ describe('Node', function() {
   describe('#_findValue', function() {
 
     it('should callback with an error if no value is found', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65528, storage: new FakeStorage() });
+      var node = Node({ address: '0.0.0.0', port: 65528, storage: new FakeStorage(), logger: new Logger(0) });
       var _find = sinon.stub(node, '_find', function(k, t, cb) {
         cb(new Error(), 'NODE');
       });
@@ -53,7 +54,7 @@ describe('Node', function() {
   describe('#_put', function() {
 
     it('should put a valid key/value pair', function() {
-      var node = Node({ address: '0.0.0.0', port: 65528, storage: new FakeStorage() });
+      var node = Node({ address: '0.0.0.0', port: 65528, storage: new FakeStorage(), logger: new Logger(0) });
       var _put = sinon.stub(node, '_putValidatedKeyValue');
       node.put('key', 'value', function() {});
       expect(_put.callCount).to.equal(1);
@@ -64,7 +65,8 @@ describe('Node', function() {
         address: '0.0.0.0',
         port: 65528,
         storage: new FakeStorage(),
-        validate: validateKeyValuePair
+        validate: validateKeyValuePair,
+        logger: new Logger(0)
       });
       node.put('key', 'value', function() {});
 
@@ -80,7 +82,8 @@ describe('Node', function() {
         address: '0.0.0.0',
         port: 65528,
         storage: new FakeStorage(),
-        validate: validateKeyValuePair
+        validate: validateKeyValuePair,
+        logger: new Logger(0)
       });
       var _put = sinon.stub(node, '_putValidatedKeyValue');
       node.put('key', 'value', function() {});
@@ -96,7 +99,7 @@ describe('Node', function() {
   describe('#_updateContact', function() {
 
     it('should ping the contact at bucket head if bucket is full', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65527, storage: new FakeStorage() });
+      var node = Node({ address: '0.0.0.0', port: 65527, storage: new FakeStorage(), logger: new Logger(0) });
       var contact = new AddressPortContact({ address: '127.0.0.1', port: 1234 });
       var _send = sinon.stub(node._rpc, 'send', function(c, m, cb) {
         cb();
@@ -120,7 +123,7 @@ describe('Node', function() {
   describe('#_handlePing', function() {
 
     it('should pong the contact', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65526, storage: new FakeStorage() });
+      var node = Node({ address: '0.0.0.0', port: 65526, storage: new FakeStorage(), logger: new Logger(0) });
       var _rpc = sinon.stub(node._rpc, 'send', function(c, m, cb) {
         expect(m.type).to.equal('PONG');
         _rpc.restore();
@@ -139,7 +142,7 @@ describe('Node', function() {
   describe('#_handleStore', function() {
 
     it('should halt if invalid key', function() {
-      var node = Node({ address: '0.0.0.0', port: 65525, storage: new FakeStorage() });
+      var node = Node({ address: '0.0.0.0', port: 65525, storage: new FakeStorage(), logger: new Logger(0) });
       var _get = sinon.stub(node._storage, 'get');
       node._handleStore({
         key: 123,
@@ -151,7 +154,7 @@ describe('Node', function() {
     });
 
     it('should halt if no value', function() {
-      var node = Node({ address: '0.0.0.0', port: 65525, storage: new FakeStorage() });
+      var node = Node({ address: '0.0.0.0', port: 65525, storage: new FakeStorage(), logger: new Logger(0) });
       var _get = sinon.stub(node._storage, 'get');
       node._handleStore({
         key: 'beep',
@@ -166,7 +169,8 @@ describe('Node', function() {
         address: '0.0.0.0',
         port: 65525,
         storage: new FakeStorage(),
-        validate: validateKeyValuePair
+        validate: validateKeyValuePair,
+        logger: new Logger(0)
       });
       var _get = sinon.stub(node._storage, 'get');
       node._handleStore({
@@ -186,7 +190,8 @@ describe('Node', function() {
         address: '0.0.0.0',
         port: 65525,
         storage: new FakeStorage(),
-        validate: validateKeyValuePair
+        validate: validateKeyValuePair,
+        logger: new Logger(0)
       });
       var _get = sinon.stub(node._storage, 'get');
       node._handleStore({
@@ -208,7 +213,7 @@ describe('Node', function() {
   describe('#_handleFindValue', function() {
 
     it('should send contacts if no value found', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65523, storage: new FakeStorage() });
+      var node = Node({ address: '0.0.0.0', port: 65523, storage: new FakeStorage(), logger: new Logger(0) });
       var _send = sinon.stub(node._rpc, 'send', function(c, m, cb) {
         expect(m.params.contacts).to.be.ok;
         _send.restore();
@@ -227,7 +232,7 @@ describe('Node', function() {
   describe('#get', function() {
 
     it('should pass along error if _findValue fails', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65522, storage: new FakeStorage() });
+      var node = Node({ address: '0.0.0.0', port: 65522, storage: new FakeStorage(), logger: new Logger(0) });
       var _findValue = sinon.stub(node, '_findValue', function(k, cb) {
         cb(new Error('Failed for some reason'));
       });
@@ -240,7 +245,7 @@ describe('Node', function() {
 
     it('should return the value in storage', function(done) {
       var storage = new FakeStorage();
-      var node = Node({ address: '0.0.0.0', port: 65522, storage: storage });
+      var node = Node({ address: '0.0.0.0', port: 65522, storage: storage, logger: new Logger(0) });
       storage.data.beep = JSON.stringify({ value: 'boop' });
       node.get('beep', function(err, val) {
         expect(err).to.equal(null);
@@ -254,7 +259,7 @@ describe('Node', function() {
   describe('#_replicate', function() {
 
     var stream = new EventEmitter();
-    var node = Node({ address: '0.0.0.0', port: 65521, storage: new FakeStorage() });
+    var node = Node({ address: '0.0.0.0', port: 65521, storage: new FakeStorage(), logger: new Logger(0) });
 
     node._storage.createReadStream = function() {
       return stream;
@@ -320,7 +325,7 @@ describe('Node', function() {
   describe('#_expire', function() {
 
     var stream = new EventEmitter();
-    var node = Node({ address: '0.0.0.0', port: 65520, storage: new FakeStorage() });
+    var node = Node({ address: '0.0.0.0', port: 65520, storage: new FakeStorage(), logger: new Logger(0) });
 
     node._storage.createReadStream = function() {
       return stream;

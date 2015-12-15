@@ -8,6 +8,7 @@ var Router = require('../lib/router');
 var Item = require('../lib/item');
 var AddressPortContact = require('../lib/contacts/address-port-contact');
 var Node = require('../lib/node');
+var Logger = require('../lib/logger');
 
 function FakeStorage() {
   this.data = {};
@@ -40,7 +41,8 @@ describe('Router', function() {
       var router = new Router('VALUE', utils.createID('foo'), new Node({
         address: '127.0.0.1',
         port: 0,
-        storage: new FakeStorage()
+        storage: new FakeStorage(),
+        logger: new Logger(0)
       }));
       var _rpc = sinon.stub(router.node._rpc, 'send', function(c, m, cb) {
         cb(new Error());
@@ -62,7 +64,8 @@ describe('Router', function() {
       var router = new Router('VALUE', utils.createID('foo'), new Node({
         address: '127.0.0.1',
         port: 0,
-        storage: new FakeStorage()
+        storage: new FakeStorage(),
+        logger: new Logger(0)
       }));
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
       router.shortlist.push(contact);
@@ -80,7 +83,8 @@ describe('Router', function() {
       var node = new Node({
         address: '127.0.0.1',
         port: 0,
-        storage: new FakeStorage()
+        storage: new FakeStorage(),
+        logger: new Logger(0)
       });
       var router = new Router('VALUE', utils.createID('foo'), node);
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
@@ -100,7 +104,8 @@ describe('Router', function() {
         address: '127.0.0.1',
         port: 0,
         storage: new FakeStorage(),
-        validate: validateKeyValuePair
+        validate: validateKeyValuePair,
+        logger: new Logger(0)
       });
       var router = new Router('VALUE', utils.createID('foo'), node);
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
@@ -127,7 +132,8 @@ describe('Router', function() {
         address: '127.0.0.1',
         port: 0,
         storage: new FakeStorage(),
-        validate: validateKeyValuePair
+        validate: validateKeyValuePair,
+        logger: new Logger(0)
       });
       var itemKey = utils.createID('beep');
       var publisherKey = utils.createID('publisher');
@@ -155,7 +161,8 @@ describe('Router', function() {
       var router = new Router('NODE', utils.createID('foo'), new Node({
         address: '127.0.0.1',
         port: 0,
-        storage: new FakeStorage()
+        storage: new FakeStorage(),
+        logger: new Logger(0)
       }));
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
       router.shortlist = new Array(constants.K);
@@ -173,7 +180,8 @@ describe('Router', function() {
       var router = new Router('NODE', utils.createID('foo'), new Node({
         address: '127.0.0.1',
         port: 0,
-        storage: new FakeStorage()
+        storage: new FakeStorage(),
+        logger: new Logger(0)
       }));
       var _send = sinon.stub(router.node._rpc, 'send');
       var contact1 = new AddressPortContact({ address: '0.0.0.0', port: 1234 });

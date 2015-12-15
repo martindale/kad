@@ -8,7 +8,7 @@ var Node = require('../lib/node');
 var Contact = require('../lib/contact');
 var Bucket = require('../lib/bucket');
 var transports = require('../lib/transports');
-var wrtc = require('wrtc');
+var Logger = require('../lib/logger');
 
 function FakeStorage() {
   this.data = {};
@@ -51,90 +51,61 @@ var node3;
 var node4;
 var node5;
 var node6;
-var node7;
-var node8;
-var node9;
 var node10;
 var node11;
 var signaller = new EventEmitter();
-
-var logLevel = Number(process.env.LOG_LEVEL);
 
 var node1opts = {
   address: '127.0.0.1',
   port: 65520,
   storage: storage1,
-  logLevel: logLevel
+  logger: new Logger(0)
 };
 var node2opts = {
   address: '127.0.0.1',
   port: 65521,
   storage: storage2,
-  logLevel: logLevel
+  logger: new Logger(0)
 };
 var node3opts = {
   address: '127.0.0.1',
   port: 65522,
   storage: storage3,
-  logLevel: logLevel
+  logger: new Logger(0)
 };
 var node4opts = {
   address: '127.0.0.1',
   port: 65523,
   storage: storage4,
-  logLevel: logLevel,
+  logger: new Logger(0),
   transport: transports.TCP
 };
 var node5opts = {
   address: '127.0.0.1',
   port: 65524,
   storage: storage5,
-  logLevel: logLevel,
+  logger: new Logger(0),
   transport: transports.TCP
 };
 var node6opts = {
   address: '127.0.0.1',
   port: 65525,
   storage: storage6,
-  logLevel: logLevel,
+  logger: new Logger(0),
   transport: transports.TCP
-};
-var node7opts = {
-  nick: '65523',
-  storage: storage7,
-  logLevel: logLevel,
-  signaller: signaller,
-  transport: transports.WebRTC,
-  wrtc: wrtc
-};
-var node8opts = {
-  nick: '65524',
-  storage: storage8,
-  logLevel: logLevel,
-  signaller: signaller,
-  transport: transports.WebRTC,
-  wrtc: wrtc
-};
-var node9opts = {
-  nick: '65525',
-  storage: storage9,
-  logLevel: logLevel,
-  signaller: signaller,
-  transport: transports.WebRTC,
-  wrtc: wrtc
 };
 var node10opts = {
   address: '127.0.0.1',
   port: 30000,
   storage: storage10,
-  logLevel: logLevel,
+  logger: new Logger(0),
   transport: transports.HTTP
 };
 var node11opts = {
   address: '127.0.0.1',
   port: 30001,
   storage: storage11,
-  logLevel: logLevel,
+  logger: new Logger(0),
   transport: transports.HTTP
 };
 
@@ -146,7 +117,8 @@ describe('Node+Router', function() {
       expect(new Node({
         storage: storage1,
         address: '0.0.0.0',
-        port: 0
+        port: 0,
+        logger: new Logger(0)
       })).to.be.instanceOf(Node);
     });
 
@@ -154,7 +126,8 @@ describe('Node+Router', function() {
       expect(Node({
         storage: storage1,
         address: '0.0.0.0',
-        port: 0
+        port: 0,
+        logger: new Logger(0)
       })).to.be.instanceOf(Node);
     });
 
@@ -162,7 +135,8 @@ describe('Node+Router', function() {
       expect(function() {
         Node({
           address: '0.0.0.0',
-          port: 0
+          port: 0,
+          logger: new Logger(0)
         })
       }).to.throw(Error, 'No storage adapter supplied');
     });
@@ -177,9 +151,6 @@ describe('Node+Router', function() {
     node4 = Node(node4opts);
     node5 = Node(node5opts);
     node6 = Node(node6opts);
-    node7 = Node(node7opts);
-    node8 = Node(node8opts);
-    node9 = Node(node9opts);
     node10 = Node(node10opts);
     node11 = Node(node11opts);
 
@@ -193,14 +164,6 @@ describe('Node+Router', function() {
     it('should connect node5 to node4 over tcp', function(done) {
       node5.connect(node4opts, function() {
         expect(Object.keys(node5._buckets)).to.have.lengthOf(1);
-        done();
-      });
-    });
-
-    it('should connect node8 to node7 over webrtc', function(done) {
-      this.timeout(5000);
-      node8.connect(node7opts, function() {
-        expect(Object.keys(node8._buckets)).to.have.lengthOf(1);
         done();
       });
     });
@@ -219,14 +182,6 @@ describe('Node+Router', function() {
       });
     });
 
-    it('should connect node9 to node8 over webrtc', function(done) {
-      this.timeout(5000);
-      node9.connect(node8opts, function() {
-        expect(Object.keys(node9._buckets)).to.have.lengthOf(2);
-        done();
-      });
-    });
-
     it('should connect node1 to node3 over udp', function(done) {
       node1.connect(node3opts, function() {
         expect(Object.keys(node1._buckets)).to.have.lengthOf(1);
@@ -241,14 +196,6 @@ describe('Node+Router', function() {
       });
     });
 
-    it('should connect node7 to node9 over webrtc', function(done) {
-      this.timeout(5000);
-      node7.connect(node9opts, function() {
-        expect(Object.keys(node7._buckets)).to.have.lengthOf(1);
-        done();
-      });
-    });
-
     it('should connect node10 to node11 over http', function(done) {
       node10.connect(node11opts, function() {
         expect(Object.keys(node10._buckets)).to.have.lengthOf(1);
@@ -257,7 +204,7 @@ describe('Node+Router', function() {
     });
 
     it('should emit an error if the connection fails', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65532, storage: new FakeStorage() });
+      var node = Node({ address: '0.0.0.0', port: 65532, storage: new FakeStorage(), logger: new Logger(0) });
       var _findNode = sinon.stub(node, '_findNode', function(id, cb) {
         return cb(new Error('fatal error'));
       });
@@ -269,7 +216,7 @@ describe('Node+Router', function() {
     });
 
     it('should not require a callback', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65531, storage: new FakeStorage() });
+      var node = Node({ address: '0.0.0.0', port: 65531, storage: new FakeStorage(), logger: new Logger(0) });
       var _findNode = sinon.stub(node, '_findNode', function(id, cb) {
         return cb(new Error('fatal error'));
       });
@@ -312,7 +259,7 @@ describe('Node+Router', function() {
     });
 
     it('should callback with an error if _findNode fails', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65530, storage: new FakeStorage() });
+      var node = Node({ address: '0.0.0.0', port: 65530, storage: new FakeStorage(), logger: new Logger(0) });
       node.put('beep', 'boop', function(err) {
         expect(err.message).to.equal('Not connected to any peers');
         done();
