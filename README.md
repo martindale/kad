@@ -48,12 +48,12 @@ dht.on('connect', function() {
 Below, we've included a complete list of all properties that can be passed to
 `kad(options)`.
 
-* **storage** - _required_: the storage adapter of your choice, see [Persistence](#Persistence).
-* **seeds** - _optional_: an array of `Contact` objects; depends on the `Transport` adapter, see [Transports](#Transports).
-* **validate** - _optional_: function for validating key/value pairs, see [Validation](#Validation).
+* **storage** - _required_: the storage adapter of your choice, see [Persistence](#persistence).
+* **seeds** - _optional_: an array of `Contact` objects; depends on the `Transport` adapter, see [Transports](#transports).
+* **validate** - _optional_: function for validating key/value pairs, see [Validation](#validation).
 * **transport** - _optional_: constructor function for the transport adapter to be used; defaults to `kad.transports.UDP`.
 * **replyto** - _optional_: provide different addressing information to peers
-* **logLevel** - _optional_: number indicating log verbosity; see [Logging](#Logging).
+* **logLevel** - _optional_: number indicating log verbosity; see [Logging](#logging).
 * **address** - _optional_: hostname or IP address of this node; used by `UDP`, `TCP`, and `HTTP` transport adapters.
 * **port** - _optional_: port to listen on; used by `UDP`, `TCP`, and `HTTP` transport adapters.
 * **nick** - _optional_: identifier for this node; used by `WebRTC` transport adapter.
@@ -146,8 +146,9 @@ community, listed below.
 
 ### Community Storage Adapters
 
-* [LocalStorage](https://github.com/omphalos/kad-localstorage)
+* [Local Storage](https://github.com/omphalos/kad-localstorage)
 * [MongoDB](https://github.com/niahmiah/kad-mongo)
+* [File System](https://github.com/gordonwritescode/kad-fs)
 
 ## Validation
 
