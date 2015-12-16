@@ -8,7 +8,8 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha test/** --recursive",
+    "test": "npm run testsuite && npm run linter",
+    "testsuite": "./node_modules/.bin/mocha test/** --recursive",
     "coverage": "./node_modules/.bin/istanbul cover -x 'lib/logger.js' ./node_modules/.bin/_mocha -- --recursive",
     "linter": "./node_modules/.bin/jshint --config .jshintrc ./index.js ./lib ./test",
     "browser-bundle": "./node_modules/.bin/browserify index.js -s kad -o dist/kad.browser.js"
