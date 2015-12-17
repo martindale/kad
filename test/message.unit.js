@@ -11,23 +11,23 @@ describe('Message', function() {
     var contact = new AddressPortContact({ address: '0.0.0.0', port: 1337 });
 
     it('should create an instance with the `new` keyword', function() {
-      expect(new Message('PING', {}, contact)).to.be.instanceOf(Message);
+      expect(new Message({
+        method: 'PING',
+        params: { contact: contact },
+      })).to.be.instanceOf(Message);
     });
 
     it('should create an instance without the `new` keyword', function() {
-      expect(Message('PING', {}, contact)).to.be.instanceOf(Message);
+      expect(Message({
+        method: 'PING',
+        params: { contact: contact },
+      })).to.be.instanceOf(Message);
     });
 
     it('should throw with invalid message type', function() {
       expect(function() {
-        Message('SOMETHING_WRONG', {}, contact);
+        Message({ method: 'SOMETHING_WRONG', params: { contact: contact } });
       }).to.throw(Error, 'Invalid message type');
-    });
-
-    it('should throw with invalid contact', function() {
-      expect(function() {
-        Message('PING', {}, '0.0.0.0:1337');
-      }).to.throw(Error, 'Invalid contact supplied');
     });
 
   });
@@ -37,12 +37,18 @@ describe('Message', function() {
     var contact = new AddressPortContact({ address: '0.0.0.0', port: 1337 });
 
     it('should return a buffer ready for sending', function() {
-      var msg = new Message('PING', {}, contact);
+      var msg = new Message({
+        method: 'PING',
+        params: { contact: contact },
+      });
       expect(msg.serialize()).to.be.instanceOf(Buffer);
     });
 
     it('should return a buffer with the same length as json', function() {
-      var msg = Message('PING', {}, contact);
+      var msg = Message({
+        method: 'PING',
+        params: { contact: contact },
+      });
       var smsg = msg.serialize();
       expect(smsg).to.have.lengthOf(JSON.stringify(msg).length);
     });

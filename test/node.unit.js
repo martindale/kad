@@ -131,15 +131,19 @@ describe('Node', function() {
         logger: new Logger(0)
       });
       var _rpc = sinon.stub(node._rpc, 'send', function(c, m) {
-        expect(m.type).to.equal('PONG');
+        expect(m.id).to.equal(utils.createID('data'));
         _rpc.restore();
         done();
       });
       node._handlePing({
-        address: '0.0.0.0',
-        port: 1234,
-        nodeID: utils.createID('data'),
-        rpcID: utils.createID('data')
+        params: {
+          contact: {
+            address: '0.0.0.0',
+            port: 65526
+          }
+        },
+        method: 'PING',
+        id: utils.createID('data')
       });
     });
 
@@ -156,9 +160,13 @@ describe('Node', function() {
       });
       var _get = sinon.stub(node._storage, 'get');
       node._handleStore({
-        key: 123,
-        value: null,
-        nodeID: utils.createID('publisher')
+        id: utils.createID('id'),
+        params: {
+          key: 123,
+          value: null,
+          contact: {}
+        },
+        method: 'STORE'
       });
       expect(_get.callCount).to.equal(0);
       _get.restore();
@@ -173,9 +181,13 @@ describe('Node', function() {
       });
       var _get = sinon.stub(node._storage, 'get');
       node._handleStore({
-        key: 'beep',
-        value: null,
-        nodeID: utils.createID('publisher')
+        id: utils.createID('id'),
+        params: {
+          key: 123,
+          value: null,
+          contact: {}
+        },
+        method: 'STORE'
       });
       expect(_get.callCount).to.equal(0);
     });
@@ -192,9 +204,13 @@ describe('Node', function() {
       });
       var _get = sinon.stub(node._storage, 'get');
       node._handleStore({
-        key: utils.createID('key'),
-        value: 'value',
-        nodeID: utils.createID('publisher')
+        method: 'STORE',
+        params: {
+          key: utils.createID('key'),
+          value: 'value',
+          contact: {}
+        },
+        id: utils.createID('publisher')
       });
       expect(_get.callCount).to.equal(0);
     });
@@ -213,9 +229,13 @@ describe('Node', function() {
       });
       var _get = sinon.stub(node._storage, 'get');
       node._handleStore({
-        key: utils.createID('key'),
-        value: 'value',
-        nodeID: utils.createID('publisher')
+        params: {
+          key: utils.createID('key'),
+          value: 'value',
+          contact: {}
+        },
+        method: 'STORE',
+        id: utils.createID('publisher')
       });
       expect(_get.callCount).to.equal(0);
     });
@@ -232,15 +252,20 @@ describe('Node', function() {
         logger: new Logger(0)
       });
       var _send = sinon.stub(node._rpc, 'send', function(c, m) {
-        expect(!!m.params.contacts).to.equal(true);
+        expect(!!m.result.nodes).to.equal(true);
         _send.restore();
         done();
       });
       node._handleFindValue({
-        key: utils.createID('beep'),
-        address: '0.0.0.0',
-        port: 1234,
-        nodeID: utils.createID('data')
+        method: 'FIND_VALUE',
+        params: {
+          key: utils.createID('beep'),
+          contact: {
+            address: '0.0.0.0',
+            port: 65523
+          }
+        },
+        id: utils.createID('data')
       });
     });
 
@@ -358,10 +383,10 @@ describe('Node', function() {
 
     var stream = new EventEmitter();
     var node = KNode({
-      address: '0.0.0.0', 
-      port: 65520, 
-      storage: new FakeStorage(), 
-      logger: new Logger(0) 
+      address: '0.0.0.0',
+      port: 65520,
+      storage: new FakeStorage(),
+      logger: new Logger(0)
     });
 
     node._storage.createReadStream = function() {

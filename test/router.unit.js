@@ -100,8 +100,10 @@ describe('Router', function() {
       state.shortlist.push(contact);
       state.closestNodeDistance = '00000000000000000001';
       router._handleFindResult(state, {
-        value: null,
-        contacts: []
+        result: {
+          nodes: []
+        },
+        id: utils.createID('test')
       }, contact, function() {
         expect(state.contactsWithoutValue).to.have.lengthOf(1);
         _rpc.restore();
@@ -125,8 +127,11 @@ describe('Router', function() {
       state.shortlist.push(contact);
       state.closestNodeDistance = '00000000000000000001';
       router._handleFindResult(state, {
-        value: 'BAD JSON',
-        contacts: []
+        result: {
+          value: 'BAD JSON',
+          nodes: []
+        },
+        id: utils.createID('test')
       }, contact, function() {
         expect(state.contactsWithoutValue).to.have.lengthOf(0);
         _rpc.restore();
@@ -156,8 +161,10 @@ describe('Router', function() {
       var publisherKey = utils.createID('publisher');
       var item = new Item(itemKey, 'boop', publisherKey);
       router._handleFindResult(state, {
-        value: JSON.stringify(item),
-        contacts: []
+        result: {
+          value: JSON.stringify(item),
+          nodes: []
+        }
       }, contact, function() {
         expect(state.shortlist).to.have.lengthOf(0);
         _rpc.restore();
@@ -171,13 +178,14 @@ describe('Router', function() {
         port: 0,
         storage: new FakeStorage(),
         validate: function(key, value) {
-          expect(key).to.equal('foo');
+          console.log(key, value)
+          expect(key).to.equal(utils.createID('foo'));
           expect(value).to.equal('boop');
           done();
         },
         logger: new Logger(0)
       });
-      var itemKey = utils.createID('beep');
+      var itemKey = utils.createID('foo');
       var publisherKey = utils.createID('publisher');
       var item = new Item(itemKey, 'boop', publisherKey);
       var state = node._router._createLookupState('VALUE', 'foo');
@@ -185,8 +193,11 @@ describe('Router', function() {
       state.shortlist.push(contact);
       state.closestNodeDistance = '00000000000000000001';
       node._router._handleFindResult(state, {
-        value: JSON.stringify(item),
-        contacts: []
+        result: {
+          value: JSON.stringify(item),
+          nodes: []
+        },
+        id: utils.createID('test')
       }, contact, expect.fail);
     });
   });
