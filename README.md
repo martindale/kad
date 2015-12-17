@@ -75,6 +75,31 @@ var dht = new kademlia.Node({
 });
 ```
 
+### Community Transport Adapters
+
+* [WebRTC](https://github.com/omphalos/kad-webrtc)
+
+### Custom Transport Adapters
+
+The primary focus for Kad's design was to create a simple, sane, minimally
+configured setup while allowing for maximum flexibility when it comes to
+building applications on or around it. This is why all of the communication
+logic is abstracted. Kad does not care how your nodes talk to one another, you
+simply provide it with the information that *your* transport adapter needs to
+communicate with peers and it will handle the rest.
+
+When building a custom `Transport`, there are a few simple steps:
+
+1. Define a contact constructor or use an existing one
+2. Implement a `_createNodeID` method
+3. Inherit your transport from `kademlia.RPC`
+4. Implement `_createContact`, `_send`, and `_close` methods
+
+A `Contact` contains the information your transport adapter needs to talk to
+other peers. A `Transport` defines how those peers communicate. The best place
+to start for learning how to implement a custom transport adapter is the
+included `lib/transports/udp.js` and `lib/contacts/address-port-contact.js`.
+
 ### Contacts
 
 Node provide each other with "contact" information which indicates how others
@@ -101,31 +126,6 @@ var dht = new kademlia.Node({
   // ...
 });
 ```
-
-### Community Transport Adapters
-
-* [WebRTC](https://github.com/gordonwritescode/kad-webrtc)
-
-### Custom Transport Adapters
-
-The primary focus for Kad's design was to create a simple, sane, minimally
-configured setup while allowing for maximum flexibility when it comes to
-building applications on or around it. This is why all of the communication
-logic is abstracted. Kad does not care how your nodes talk to one another, you
-simply provide it with the information that *your* transport adapter needs to
-communicate with peers and it will handle the rest.
-
-When building a custom `Transport`, there are a few simple steps:
-
-1. Define a contact constructor or use an existing one
-2. Implement a `_createNodeID` method
-3. Inherit your transport from `kademlia.RPC`
-4. Implement `_createContact`, `_send`, and `_close` methods
-
-A `Contact` contains the information your transport adapter needs to talk to
-other peers. A `Transport` defines how those peers communicate. The best place
-to start for learning how to implement a custom transport adapter is the
-included `lib/transports/udp.js` and `lib/contacts/address-port-contact.js`.
 
 ## Persistence
 
