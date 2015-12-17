@@ -35,22 +35,40 @@ FakeStorage.prototype.createReadStream = function() {
 
 describe('Router', function() {
 
+  describe('#findValue', function() {
+
+    it('should callback with an error if no value is found', function(done) {
+      var node = Node({ address: '0.0.0.0', port: 65528, storage: new FakeStorage(), logger: new Logger(0) });
+      var _find = sinon.stub(node._router, 'lookup', function(k, t, cb) {
+        cb(new Error(), 'NODE');
+      });
+      node._router.findValue('beep', function(err) {
+        expect(err.message).to.equal('Failed to find value for key: beep');
+        _find.restore();
+        done();
+      });
+    });
+
+  });
+
   describe('#_queryContact', function() {
 
     it('should remove the contact from the shortlist on error', function(done) {
-      var router = new Router('VALUE', utils.createID('foo'), new Node({
+      var node = new Node({
         address: '127.0.0.1',
         port: 0,
         storage: new FakeStorage(),
         logger: new Logger(0)
-      }));
-      var _rpc = sinon.stub(router.node._rpc, 'send', function(c, m, cb) {
+      });
+      var router = node._router;
+      var _rpc = sinon.stub(router._rpc, 'send', function(c, m, cb) {
         cb(new Error());
       });
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
-      router.shortlist.push(contact);
-      router._queryContact(contact, function() {
-        expect(router.shortlist).to.have.lengthOf(0);
+      var state = router._createLookupState('VALUE', 'foo');
+      state.shortlist.push(contact);
+      router._queryContact(state, contact, function() {
+        expect(state.shortlist).to.have.lengthOf(0);
         _rpc.restore();
         done();
       });
@@ -61,20 +79,25 @@ describe('Router', function() {
   describe('#_handleFindResult', function() {
 
     it('should track contact without value to store later', function(done) {
-      var router = new Router('VALUE', utils.createID('foo'), new Node({
+      var node = new Node({
         address: '127.0.0.1',
         port: 0,
         storage: new FakeStorage(),
         logger: new Logger(0)
-      }));
+      });
+      var router = node._router;
+      var _rpc = sinon.stub(router._rpc, 'send', function(c, m, cb) {
+        cb(new Error());
+      });
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
-      router.shortlist.push(contact);
-      router.closestNodeDistance = '00000000000000000001';
-      router._handleFindResult({
+      var state = router._createLookupState('VALUE', 'foo');
+      state.shortlist.push(contact);
+      state.closestNodeDistance = '00000000000000000001';
+      router._handleFindResult(state, {
         value: null,
         contacts: []
       }, contact, function() {
-        expect(router.contactsWithoutValue).to.have.lengthOf(1);
+        expect(state.contactsWithoutValue).to.have.lengthOf(1);
         done();
       });
     });
@@ -86,15 +109,19 @@ describe('Router', function() {
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
-      var router = new Router('VALUE', utils.createID('foo'), node);
+      var router = node._router;
+      var _rpc = sinon.stub(router._rpc, 'send', function(c, m, cb) {
+        cb(new Error());
+      });
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
-      router.shortlist.push(contact);
-      router.closestNodeDistance = '00000000000000000001';
-      router._handleFindResult({
-        value: 'bad JSON',
+      var state = router._createLookupState('VALUE', 'foo');
+      state.shortlist.push(contact);
+      state.closestNodeDistance = '00000000000000000001';
+      router._handleFindResult(state, {
+        value: 'BAD JSON',
         contacts: []
       }, contact, function() {
-        expect(router.shortlist).to.have.lengthOf(0);
+        expect(state.contactsWithoutValue).to.have.lengthOf(0);
         done();
       });
     });
@@ -104,27 +131,29 @@ describe('Router', function() {
         address: '127.0.0.1',
         port: 0,
         storage: new FakeStorage(),
-        validate: validateKeyValuePair,
-        logger: new Logger(0)
+        logger: new Logger(0),
+        validate: function(key, value, callback) {
+          callback(false);
+        }
       });
-      var router = new Router('VALUE', utils.createID('foo'), node);
+      var router = node._router;
+      var _rpc = sinon.stub(router._rpc, 'send', function(c, m, cb) {
+        cb(new Error());
+      });
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
-      router.shortlist.push(contact);
-      router.closestNodeDistance = '00000000000000000001';
+      var state = router._createLookupState('VALUE', 'foo');
+      state.shortlist.push(contact);
+      state.closestNodeDistance = '00000000000000000001';
       var itemKey = utils.createID('beep');
       var publisherKey = utils.createID('publisher');
       var item = new Item(itemKey, 'boop', publisherKey);
-      router._handleFindResult({
+      router._handleFindResult(state, {
         value: JSON.stringify(item),
         contacts: []
       }, contact, function() {
-        expect(router.shortlist).to.have.lengthOf(0);
+        expect(state.shortlist).to.have.lengthOf(0);
         done();
       });
-
-      function validateKeyValuePair(key, value, callback) {
-        callback(false);
-      }
     });
 
     it('should send key/value pair to validator', function(done) {
@@ -132,42 +161,41 @@ describe('Router', function() {
         address: '127.0.0.1',
         port: 0,
         storage: new FakeStorage(),
-        validate: validateKeyValuePair,
+        validate: function(key, value, callback) {
+          expect(key).to.equal('foo');
+          expect(value).to.equal('boop');
+          done();
+        },
         logger: new Logger(0)
       });
       var itemKey = utils.createID('beep');
       var publisherKey = utils.createID('publisher');
       var item = new Item(itemKey, 'boop', publisherKey);
-      var router = new Router('VALUE', utils.createID('key'), node);
+      var state = node._router._createLookupState('VALUE', 'foo');
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
-      router.shortlist.push(contact);
-      router.closestNodeDistance = '00000000000000000001';
-      router._handleFindResult({
+      state.shortlist.push(contact);
+      state.closestNodeDistance = '00000000000000000001';
+      node._router._handleFindResult(state, {
         value: JSON.stringify(item),
         contacts: []
       }, contact, expect.fail);
-
-      function validateKeyValuePair(key, value, callback) {
-        expect(key).to.equal(utils.createID('key'));
-        expect(value).to.equal('boop');
-        done();
-      };
     });
   });
 
   describe('#_handleQueryResults', function() {
 
     it('should callback with the shortlist if it is full', function(done) {
-      var router = new Router('NODE', utils.createID('foo'), new Node({
+      var node = new Node({
         address: '127.0.0.1',
         port: 0,
         storage: new FakeStorage(),
         logger: new Logger(0)
-      }));
+      });
+      var state = node._router._createLookupState('VALUE', utils.createID('foo'));
       var contact = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
-      router.shortlist = new Array(constants.K);
-      router._handleQueryResults(function(err, type, contacts) {
-        expect(contacts).to.equal(router.shortlist);
+      state.shortlist = new Array(constants.K);
+      node._router._handleQueryResults(state, function(err, type, contacts) {
+        expect(contacts).to.equal(state.shortlist);
         done();
       });
     });
@@ -177,17 +205,18 @@ describe('Router', function() {
   describe('#_handleValueReturned', function() {
 
     it('should store at closest node that did not have value', function(done) {
-      var router = new Router('NODE', utils.createID('foo'), new Node({
+      var node = new Node({
         address: '127.0.0.1',
         port: 0,
         storage: new FakeStorage(),
         logger: new Logger(0)
-      }));
-      var _send = sinon.stub(router.node._rpc, 'send');
+      });
+      var _send = sinon.stub(node._router._rpc, 'send');
       var contact1 = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
       var contact2 = new AddressPortContact({ address: '0.0.0.0', port: 1235 });
-      router.contactsWithoutValue = [contact1, contact2];
-      router._handleValueReturned(function(err, type, contacts) {
+      var state = node._router._createLookupState('NODE', utils.createID('foo'));
+      state.contactsWithoutValue = [contact1, contact2];
+      node._router._handleValueReturned(state, function(err, type, contacts) {
         expect(_send.callCount).to.equal(1);
         expect(_send.calledWith(contact1)).to.equal(true);
         done();

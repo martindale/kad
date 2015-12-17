@@ -35,22 +35,6 @@ FakeStorage.prototype.createReadStream = function() {
 
 describe('Node', function() {
 
-  describe('#_findValue', function() {
-
-    it('should callback with an error if no value is found', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65528, storage: new FakeStorage(), logger: new Logger(0) });
-      var _find = sinon.stub(node, '_find', function(k, t, cb) {
-        cb(new Error(), 'NODE');
-      });
-      node._findValue('beep', function(err) {
-        expect(err.message).to.equal('Failed to find value for key: beep');
-        _find.restore();
-        done();
-      });
-    });
-
-  });
-
   describe('#_put', function() {
 
     it('should put a valid key/value pair', function() {
@@ -106,14 +90,14 @@ describe('Node', function() {
       });
       var counter = 0;
       var bucketContact;
-      node._buckets[159] = new Bucket();
+      node._router._buckets[159] = new Bucket();
       for (var i = 0; i < constants.B; i++) {
         bucketContact = AddressPortContact({ address: '127.0.0.1', port: counter });
-        node._buckets[159].addContact(bucketContact);
+        node._router._buckets[159].addContact(bucketContact);
         counter++;
       }
-      node._updateContact(contact, function() {
-        expect(node._buckets[159].hasContact(contact.nodeID)).to.equal(false);
+      node._router.updateContact(contact, function() {
+        expect(node._router._buckets[159].hasContact(contact.nodeID)).to.equal(false);
         done();
       });
     });
@@ -233,7 +217,7 @@ describe('Node', function() {
 
     it('should pass along error if _findValue fails', function(done) {
       var node = Node({ address: '0.0.0.0', port: 65522, storage: new FakeStorage(), logger: new Logger(0) });
-      var _findValue = sinon.stub(node, '_findValue', function(k, cb) {
+      var _findValue = sinon.stub(node._router, 'findValue', function(k, cb) {
         cb(new Error('Failed for some reason'));
       });
       node.get('beep', function(err) {

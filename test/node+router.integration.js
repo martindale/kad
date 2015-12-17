@@ -156,56 +156,56 @@ describe('Node+Router', function() {
 
     it('should connect node2 to node1 over udp', function(done) {
       node2.connect(node1opts, function() {
-        expect(Object.keys(node2._buckets)).to.have.lengthOf(1);
+        expect(Object.keys(node2._router._buckets)).to.have.lengthOf(1);
         done();
       });
     });
 
     it('should connect node5 to node4 over tcp', function(done) {
       node5.connect(node4opts, function() {
-        expect(Object.keys(node5._buckets)).to.have.lengthOf(1);
+        expect(Object.keys(node5._router._buckets)).to.have.lengthOf(1);
         done();
       });
     });
 
     it('should connect node3 to node2 over udp', function(done) {
       node3.connect(node2opts, function() {
-        expect(Object.keys(node3._buckets)).to.have.lengthOf(2);
+        expect(Object.keys(node3._router._buckets)).to.have.lengthOf(2);
         done();
       });
     });
 
     it('should connect node6 to node5 over tcp', function(done) {
       node6.connect(node5opts, function() {
-        expect(Object.keys(node6._buckets)).to.have.lengthOf(2);
+        expect(Object.keys(node6._router._buckets)).to.have.lengthOf(2);
         done();
       });
     });
 
     it('should connect node1 to node3 over udp', function(done) {
       node1.connect(node3opts, function() {
-        expect(Object.keys(node1._buckets)).to.have.lengthOf(1);
+        expect(Object.keys(node1._router._buckets)).to.have.lengthOf(1);
         done();
       });
     });
 
     it('should connect node4 to node6 over tcp', function(done) {
       node4.connect(node6opts, function() {
-        expect(Object.keys(node4._buckets)).to.have.lengthOf(1);
+        expect(Object.keys(node4._router._buckets)).to.have.lengthOf(1);
         done();
       });
     });
 
     it('should connect node10 to node11 over http', function(done) {
       node10.connect(node11opts, function() {
-        expect(Object.keys(node10._buckets)).to.have.lengthOf(1);
+        expect(Object.keys(node10._router._buckets)).to.have.lengthOf(1);
         done();
       });
     });
 
     it('should emit an error if the connection fails', function(done) {
       var node = Node({ address: '0.0.0.0', port: 65532, storage: new FakeStorage(), logger: new Logger(0) });
-      var _findNode = sinon.stub(node, '_findNode', function(id, cb) {
+      var _findNode = sinon.stub(node._router, 'findNode', function(id, cb) {
         return cb(new Error('fatal error'));
       });
       node.connect({ address: '127.0.0.1', port: 3333 }, function(err) {
@@ -217,7 +217,7 @@ describe('Node+Router', function() {
 
     it('should not require a callback', function(done) {
       var node = Node({ address: '0.0.0.0', port: 65531, storage: new FakeStorage(), logger: new Logger(0) });
-      var _findNode = sinon.stub(node, '_findNode', function(id, cb) {
+      var _findNode = sinon.stub(node._router, 'findNode', function(id, cb) {
         return cb(new Error('fatal error'));
       });
       node.on('error', function(err) {
