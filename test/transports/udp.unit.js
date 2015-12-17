@@ -2,7 +2,6 @@
 
 var expect = require('chai').expect;
 var sinon = require('sinon');
-var constants = require('../../lib/constants');
 var RPC = require('../../lib/transports/udp');
 var AddressPortContact = require('../../lib/contacts/address-port-contact');
 var Message = require('../../lib/message');
@@ -52,17 +51,19 @@ describe('Transports/UDP', function() {
 
     before(function(done) {
       var count = 0;
-      rpc1 = new RPC(contact1);
-      rpc2 = new RPC(contact1);
-      rpc1.on('ready', inc);
-      rpc2.on('ready', inc);
       function inc() {
         count++;
         ready();
       }
       function ready() {
-        if (count === 2) done();
+        if (count === 2) {
+          done();
+        }
       }
+      rpc1 = new RPC(contact1);
+      rpc2 = new RPC(contact2);
+      rpc1.on('ready', inc);
+      rpc2.on('ready', inc);
     });
 
     after(function() {
@@ -95,7 +96,7 @@ describe('Transports/UDP', function() {
       var addr2 = rpc2._socket.address();
       var contactRpc1 = new AddressPortContact(addr1);
       var contactRpc2 = new AddressPortContact(addr2);
-      var msg = new Message('PING', {}, contactRpc1);
+      var msg = new Message('PING', {}, contactRpc2);
       rpc2.send(contactRpc1, msg);
       var calls = Object.keys(rpc2._pendingCalls);
       expect(calls).to.have.lengthOf(0);
@@ -157,7 +158,7 @@ describe('Transports/UDP', function() {
           expect(params.referenceID).to.equal(10);
           done();
         }
-      }
+      };
       rpc._handleMessage(validMsg2, { address: '127.0.0.1', port: 1234 });
     });
 
@@ -170,11 +171,11 @@ describe('Transports/UDP', function() {
       var rpc = new RPC(contact);
       var freshHandler = sinon.stub();
       var staleHandler = sinon.spy();
-      rpc._pendingCalls['rpc_id_1'] = {
+      rpc._pendingCalls.rpc_id_1 = {
         timestamp: new Date('1970-1-1'),
         callback: staleHandler
       };
-      rpc._pendingCalls['rpc_id_2'] = {
+      rpc._pendingCalls.rpc_id_2 = {
         timestamp: new Date('3070-1-1'),
         callback: freshHandler
       };

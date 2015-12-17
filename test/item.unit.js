@@ -24,19 +24,19 @@ describe('Item', function() {
 
     it('should throw with an invalid key', function() {
       expect(function() {
-        new Item(123, 'boop', publisher)
+        Item(123, 'boop', publisher);
       }).to.throw(Error);
     });
 
     it('should throw without a value', function() {
       expect(function() {
-        new Item('beep', null, publisher)
+        Item('beep', null, publisher);
       }).to.throw(Error);
     });
 
     it('should throw without a valid publisher', function() {
       expect(function() {
-        new Item(utils.createID('beep'), 'boop', '0.0.0.0:1337')
+        Item(utils.createID('beep'), 'boop', '0.0.0.0:1337');
       }).to.throw(Error);
     });
 
@@ -49,7 +49,12 @@ describe('Item', function() {
 
     it('should throw if timestamp is in the future', function() {
       expect(function() {
-        new Item(utils.createID('beep'), 'boop', '0.0.0.0:1337', new Date('3000-1-1').getTime())
+        Item(
+          utils.createID('beep'),
+          'boop',
+          '0.0.0.0:1337',
+          new Date('3000-1-1').getTime()
+        );
       }).to.throw(Error);
     });
 

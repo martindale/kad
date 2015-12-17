@@ -5,11 +5,11 @@ var AddressPortContact = require('../lib/contacts/address-port-contact');
 var RPC = require('../lib/rpc');
 var inherits = require('util').inherits;
 
-inherits(FakeTransport, RPC);
-
 function FakeTransport(options) {
   RPC.call(this, options);
 }
+
+inherits(FakeTransport, RPC);
 
 FakeTransport.prototype._createContact = function(options) {
   return new AddressPortContact(options);

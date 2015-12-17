@@ -1,7 +1,6 @@
 'use strict';
 
 var expect = require('chai').expect;
-var constants = require('../lib/constants');
 var Message = require('../lib/message');
 var AddressPortContact = require('../lib/contacts/address-port-contact');
 
@@ -44,7 +43,7 @@ describe('Message', function() {
 
     it('should return a buffer with the same length as json', function() {
       var msg = Message('PING', {}, contact);
-      var smsg = msg.serialize()
+      var smsg = msg.serialize();
       expect(smsg).to.have.lengthOf(JSON.stringify(msg).length);
     });
 

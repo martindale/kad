@@ -50,8 +50,12 @@ describe('Utils', function() {
   describe('#getDistance', function() {
 
     it('should correctly calculate distance', function() {
-      var result1 = utils.hexToBuffer('0000000000000000000000000000000000000001');
-      var result2 = utils.hexToBuffer('0070000000000000000000000000000000000001');
+      var result1 = utils.hexToBuffer(
+        '0000000000000000000000000000000000000001'
+      );
+      var result2 = utils.hexToBuffer(
+        '0070000000000000000000000000000000000001'
+      );
       expect(utils.getDistance(
         'ffbfba8945192d408d3dcc52ba24903a00000000',
         'ffbfba8945192d408d3dcc52ba24903a00000001'
@@ -153,7 +157,7 @@ describe('Utils', function() {
       }).to.throw(Error);
       expect(function() {
         utils.getPowerOfTwoBuffer(5);
-      }).to.be.ok;
+      }).to.not.throw(Error);
     });
 
     it('should calculate the correct value', function() {
@@ -172,7 +176,7 @@ describe('Utils', function() {
         for (var i = 0; i < b.length; i++) {
           expect(b[i]).to.equal(test[i]);
         }
-      }
+      };
 
       testCalculation(0, 19, 1);
       testCalculation(159, 0, 0x80);
@@ -201,7 +205,7 @@ describe('Utils', function() {
         for (var i = 0; i < 500; i++) {
           var num = utils.getRandomInBucketRangeBuffer(n);
           checkZero(num, limit);
-          expect(num[limit] < pow).to.be.ok;
+          expect(num[limit] < pow).to.equal(true);
         }
       }
 

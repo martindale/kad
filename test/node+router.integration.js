@@ -1,12 +1,8 @@
 'use strict';
 
 var expect = require('chai').expect;
-var EventEmitter = require('events').EventEmitter;
 var sinon = require('sinon');
-var constants = require('../lib/constants');
-var Node = require('../lib/node');
-var Contact = require('../lib/contact');
-var Bucket = require('../lib/bucket');
+var KNode = require('../lib/node');
 var transports = require('../lib/transports');
 var Logger = require('../lib/logger');
 
@@ -15,7 +11,9 @@ function FakeStorage() {
 }
 
 FakeStorage.prototype.get = function(key, cb) {
-  if (!this.data[key]) return cb(new Error('not found'));
+  if (!this.data[key]) {
+    return cb(new Error('not found'));
+  }
   cb(null, this.data[key]);
 };
 
@@ -39,9 +37,6 @@ var storage3 = new FakeStorage();
 var storage4 = new FakeStorage();
 var storage5 = new FakeStorage();
 var storage6 = new FakeStorage();
-var storage7 = new FakeStorage();
-var storage8 = new FakeStorage();
-var storage9 = new FakeStorage();
 var storage10 = new FakeStorage();
 var storage11 = new FakeStorage();
 
@@ -53,7 +48,6 @@ var node5;
 var node6;
 var node10;
 var node11;
-var signaller = new EventEmitter();
 
 var node1opts = {
   address: '127.0.0.1',
@@ -114,30 +108,30 @@ describe('Node+Router', function() {
   describe('@constructor', function() {
 
     it('should create an instance with the `new` keyword', function() {
-      expect(new Node({
+      expect(new KNode({
         storage: storage1,
         address: '0.0.0.0',
         port: 0,
         logger: new Logger(0)
-      })).to.be.instanceOf(Node);
+      })).to.be.instanceOf(KNode);
     });
 
     it('should create an instance without the `new` keyword', function() {
-      expect(Node({
+      expect(KNode({
         storage: storage1,
         address: '0.0.0.0',
         port: 0,
         logger: new Logger(0)
-      })).to.be.instanceOf(Node);
+      })).to.be.instanceOf(KNode);
     });
 
     it('should throw if no storage adapter is supplied', function() {
       expect(function() {
-        Node({
+        KNode({
           address: '0.0.0.0',
           port: 0,
           logger: new Logger(0)
-        })
+        });
       }).to.throw(Error, 'No storage adapter supplied');
     });
 
@@ -145,16 +139,9 @@ describe('Node+Router', function() {
 
   describe('#connect', function() {
 
-    node1 = Node(node1opts);
-    node2 = Node(node2opts);
-    node3 = Node(node3opts);
-    node4 = Node(node4opts);
-    node5 = Node(node5opts);
-    node6 = Node(node6opts);
-    node10 = Node(node10opts);
-    node11 = Node(node11opts);
-
     it('should connect node2 to node1 over udp', function(done) {
+      node1 = KNode(node1opts);
+      node2 = KNode(node2opts);
       node2.connect(node1opts, function() {
         expect(Object.keys(node2._router._buckets)).to.have.lengthOf(1);
         done();
@@ -162,6 +149,8 @@ describe('Node+Router', function() {
     });
 
     it('should connect node5 to node4 over tcp', function(done) {
+      node4 = KNode(node4opts);
+      node5 = KNode(node5opts);
       node5.connect(node4opts, function() {
         expect(Object.keys(node5._router._buckets)).to.have.lengthOf(1);
         done();
@@ -169,6 +158,7 @@ describe('Node+Router', function() {
     });
 
     it('should connect node3 to node2 over udp', function(done) {
+      node3 = KNode(node3opts);
       node3.connect(node2opts, function() {
         expect(Object.keys(node3._router._buckets)).to.have.lengthOf(2);
         done();
@@ -176,6 +166,7 @@ describe('Node+Router', function() {
     });
 
     it('should connect node6 to node5 over tcp', function(done) {
+      node6 = KNode(node6opts);
       node6.connect(node5opts, function() {
         expect(Object.keys(node6._router._buckets)).to.have.lengthOf(2);
         done();
@@ -197,6 +188,8 @@ describe('Node+Router', function() {
     });
 
     it('should connect node10 to node11 over http', function(done) {
+      node10 = KNode(node10opts);
+      node11 = KNode(node11opts);
       node10.connect(node11opts, function() {
         expect(Object.keys(node10._router._buckets)).to.have.lengthOf(1);
         done();
@@ -204,7 +197,12 @@ describe('Node+Router', function() {
     });
 
     it('should emit an error if the connection fails', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65532, storage: new FakeStorage(), logger: new Logger(0) });
+      var node = KNode({
+        address: '0.0.0.0',
+        port: 65532,
+        storage: new FakeStorage(),
+        logger: new Logger(0)
+      });
       var _findNode = sinon.stub(node._router, 'findNode', function(id, cb) {
         return cb(new Error('fatal error'));
       });
@@ -216,7 +214,12 @@ describe('Node+Router', function() {
     });
 
     it('should not require a callback', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65531, storage: new FakeStorage(), logger: new Logger(0) });
+      var node = KNode({
+        address: '0.0.0.0',
+        port: 65531,
+        storage: new FakeStorage(),
+        logger: new Logger(0)
+      });
       var _findNode = sinon.stub(node._router, 'findNode', function(id, cb) {
         return cb(new Error('fatal error'));
       });
@@ -235,14 +238,14 @@ describe('Node+Router', function() {
 
     it('should succeed in setting the value to the dht', function(done) {
       node1.put('beep', 'boop', function(err) {
-        expect(err).to.not.be.ok;
+        expect(err).to.equal(undefined);
         done();
       });
     });
 
     it('should succeed in setting the value to the dht', function(done) {
       node10.put('beep', 'boop', function(err) {
-        expect(err).to.not.be.ok;
+        expect(err).to.equal(undefined);
         done();
       });
     });
@@ -259,7 +262,12 @@ describe('Node+Router', function() {
     });
 
     it('should callback with an error if _findNode fails', function(done) {
-      var node = Node({ address: '0.0.0.0', port: 65530, storage: new FakeStorage(), logger: new Logger(0) });
+      var node = KNode({
+        address: '0.0.0.0',
+        port: 65530,
+        storage: new FakeStorage(),
+        logger: new Logger(0)
+      });
       node.put('beep', 'boop', function(err) {
         expect(err.message).to.equal('Not connected to any peers');
         done();
@@ -290,7 +298,7 @@ describe('Node+Router', function() {
       var _get = sinon.stub(node3, 'get', function(k, cb) {
         cb(new Error('fail'));
       });
-      node3.get('beep', function(err, val) {
+      node3.get('beep', function(err) {
         expect(err.message).to.equal('fail');
         _get.restore();
         done();
