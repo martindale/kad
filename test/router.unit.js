@@ -128,8 +128,7 @@ describe('Router', function() {
       state.closestNodeDistance = '00000000000000000001';
       router._handleFindResult(state, {
         result: {
-          value: 'BAD JSON',
-          nodes: []
+          item: 'BAD JSON'
         },
         id: utils.createID('test')
       }, contact, function() {
@@ -162,8 +161,7 @@ describe('Router', function() {
       var item = new Item(itemKey, 'boop', publisherKey);
       router._handleFindResult(state, {
         result: {
-          value: JSON.stringify(item),
-          nodes: []
+          item: item
         }
       }, contact, function() {
         expect(state.shortlist).to.have.lengthOf(0);
@@ -193,8 +191,7 @@ describe('Router', function() {
       state.closestNodeDistance = '00000000000000000001';
       node._router._handleFindResult(state, {
         result: {
-          value: JSON.stringify(item),
-          nodes: []
+          item: item
         },
         id: utils.createID('test')
       }, contact, expect.fail);
