@@ -59,7 +59,7 @@ var node2opts = {
   address: '127.0.0.1',
   port: 65521,
   storage: storage2,
-  logger: new Logger(4)
+  logger: new Logger(0)
 };
 var node3opts = {
   address: '127.0.0.1',
