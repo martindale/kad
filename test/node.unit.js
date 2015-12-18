@@ -162,9 +162,14 @@ describe('Node', function() {
       node._handleStore({
         id: utils.createID('id'),
         params: {
-          key: 123,
-          value: null,
-          contact: {}
+          item: {
+            key: 123,
+            value: null,
+            publisher: utils.createID('publisher')
+          },
+          contact: {
+            nodeID: utils.createID('publisher')
+          }
         },
         method: 'STORE'
       });
@@ -183,9 +188,14 @@ describe('Node', function() {
       node._handleStore({
         id: utils.createID('id'),
         params: {
-          key: 123,
-          value: null,
-          contact: {}
+          item: {
+            key: 123,
+            value: null,
+            publisher: utils.createID('publisher')
+          },
+          contact: {
+            nodeID: utils.createID('publisher')
+          }
         },
         method: 'STORE'
       });
@@ -206,9 +216,14 @@ describe('Node', function() {
       node._handleStore({
         method: 'STORE',
         params: {
-          key: utils.createID('key'),
-          value: 'value',
-          contact: {}
+          item: {
+            key: utils.createID('key'),
+            value: 'value',
+            publisher: utils.createID('publisher')
+          },
+          contact: {
+            nodeID: utils.createID('publisher')
+          }
         },
         id: utils.createID('publisher')
       });
@@ -230,9 +245,13 @@ describe('Node', function() {
       var _get = sinon.stub(node._storage, 'get');
       node._handleStore({
         params: {
-          key: utils.createID('key'),
-          value: 'value',
-          contact: {}
+          item: {
+            key: utils.createID('key'),
+            value: 'value'
+          },
+          contact: {
+            nodeID: utils.createID('publisher')
+          }
         },
         method: 'STORE',
         id: utils.createID('publisher')

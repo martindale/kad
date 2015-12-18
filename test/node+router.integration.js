@@ -59,13 +59,13 @@ var node2opts = {
   address: '127.0.0.1',
   port: 65521,
   storage: storage2,
-  logger: new Logger(0)
+  logger: new Logger(4)
 };
 var node3opts = {
   address: '127.0.0.1',
   port: 65522,
   storage: storage3,
-  logger: new Logger(0)
+  logger: new Logger(4)
 };
 var node4opts = {
   address: '127.0.0.1',
@@ -148,6 +148,21 @@ describe('Node+Router', function() {
       });
     });
 
+    it('should connect node3 to node2 over udp', function(done) {
+      node3 = KNode(node3opts);
+      node3.connect(node2opts, function() {
+        expect(Object.keys(node3._router._buckets)).to.have.lengthOf(2);
+        done();
+      });
+    });
+
+    it('should connect node1 to node3 over udp', function(done) {
+      node1.connect(node3opts, function() {
+        expect(Object.keys(node1._router._buckets)).to.have.lengthOf(1);
+        done();
+      });
+    });
+
     it('should connect node5 to node4 over tcp', function(done) {
       node4 = KNode(node4opts);
       node5 = KNode(node5opts);
@@ -157,25 +172,10 @@ describe('Node+Router', function() {
       });
     });
 
-    it('should connect node3 to node2 over udp', function(done) {
-      node3 = KNode(node3opts);
-      node3.connect(node2opts, function() {
-        expect(Object.keys(node3._router._buckets)).to.have.lengthOf(2);
-        done();
-      });
-    });
-
     it('should connect node6 to node5 over tcp', function(done) {
       node6 = KNode(node6opts);
       node6.connect(node5opts, function() {
         expect(Object.keys(node6._router._buckets)).to.have.lengthOf(2);
-        done();
-      });
-    });
-
-    it('should connect node1 to node3 over udp', function(done) {
-      node1.connect(node3opts, function() {
-        expect(Object.keys(node1._router._buckets)).to.have.lengthOf(1);
         done();
       });
     });

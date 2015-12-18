@@ -178,8 +178,7 @@ describe('Router', function() {
         port: 0,
         storage: new FakeStorage(),
         validate: function(key, value) {
-          console.log(key, value)
-          expect(key).to.equal(utils.createID('foo'));
+          expect(key).to.equal('foo');
           expect(value).to.equal('boop');
           done();
         },
