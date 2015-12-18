@@ -19,7 +19,7 @@ FakeStorage.prototype.get = function(key, cb) {
 
 FakeStorage.prototype.put = function(key, val, cb) {
   this.data[key] = val;
-  cb(null, this.data[key]);
+  cb(null);
 };
 
 FakeStorage.prototype.del = function(key, cb) {
