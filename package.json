@@ -5,7 +5,9 @@
   "main": "index.js",
   "directories": {
     "test": "test",
-    "lib": "lib"
+    "lib": "lib",
+    "doc": "doc",
+    "example": "example"
   },
   "scripts": {
     "test": "npm run testsuite && npm run linter",

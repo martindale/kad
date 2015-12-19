@@ -4,8 +4,9 @@ Kad
 [![Build Status](https://travis-ci.org/gordonwritescode/kad.svg?branch=master)](https://travis-ci.org/gordonwritescode/kad)
 [![Coverage Status](https://coveralls.io/repos/gordonwritescode/kad/badge.svg)](https://coveralls.io/r/gordonwritescode/kad)
 
-A highly extensible implementation of the kademlia distributed hash table for
-Node.js and the browser.
+Extensible implementation of the
+[Kademlia](http://www.scs.stanford.edu/~dm/home/papers/kpos.pdf) distributed
+hash table for Node.js and the browser.
 
 ## Getting Started
 
