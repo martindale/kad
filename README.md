@@ -10,7 +10,7 @@ Node.js and the browser.
 ## Getting Started
 
 ```bash
-npm install kad
+npm install kad@1.0.0-beta
 ```
 
 Create your node, plug in your storage adapter, join the network, and party!
