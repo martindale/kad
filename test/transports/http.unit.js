@@ -2,7 +2,6 @@
 
 var expect = require('chai').expect;
 var sinon = require('sinon');
-var constants = require('../../lib/constants');
 var RPC = require('../../lib/transports/http');
 var AddressPortContact = require('../../lib/contacts/address-port-contact');
 var Message = require('../../lib/message');
@@ -52,17 +51,19 @@ describe('Transports/HTTP', function() {
 
     before(function(done) {
       var count = 0;
-      rpc1 = new RPC(contact1);
-      rpc2 = new RPC(contact1);
-      rpc1.on('ready', inc);
-      rpc2.on('ready', inc);
       function inc() {
         count++;
         ready();
       }
       function ready() {
-        if (count === 2) done();
+        if (count === 2) {
+          done();
+        }
       }
+      rpc1 = new RPC(contact1);
+      rpc2 = new RPC(contact2);
+      rpc1.on('ready', inc);
+      rpc2.on('ready', inc);
     });
 
     after(function() {
@@ -82,7 +83,10 @@ describe('Transports/HTTP', function() {
       var addr2 = rpc2._server.address();
       var contactRpc1 = new AddressPortContact(addr1);
       var contactRpc2 = new AddressPortContact(addr2);
-      var msg = new Message('PING', {}, contactRpc1);
+      var msg = new Message({
+        method: 'PING',
+        params: { contact: contactRpc1 },
+      });
       var handler = sinon.stub();
       rpc1.send(contactRpc2, msg, handler);
       var calls = Object.keys(rpc1._pendingCalls);
@@ -95,7 +99,10 @@ describe('Transports/HTTP', function() {
       var addr2 = rpc2._server.address();
       var contactRpc1 = new AddressPortContact(addr1);
       var contactRpc2 = new AddressPortContact(addr2);
-      var msg = new Message('PING', {}, contactRpc1);
+      var msg = new Message({
+        method: 'PING',
+        params: { contact: contactRpc2 },
+      });
       rpc2.send(contactRpc1, msg);
       var calls = Object.keys(rpc2._pendingCalls);
       expect(calls).to.have.lengthOf(0);
@@ -122,8 +129,15 @@ describe('Transports/HTTP', function() {
 
     var contact1 = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
     var contact2 = new AddressPortContact({ address: '0.0.0.0', port: 0 });
-    var validMsg1 = Message('PING', { rpcID: 10 }, contact1).serialize();
-    var validMsg2 = Message('PONG', { referenceID: 10 }, contact1).serialize();
+    var validMsg1 = Message({
+      method: 'PING',
+      params: { contact: contact1 },
+    }).serialize();
+    validMsg1.id = 10;
+    var validMsg2 = Message({
+      id: 10,
+      result: { contact: contact1 },
+    }).serialize();
     var invalidMsg = Buffer(JSON.stringify({ type: 'WRONG', params: {} }));
     var invalidJSON = Buffer('i am a bad message');
     var rpc = new RPC(contact2);
@@ -152,12 +166,12 @@ describe('Transports/HTTP', function() {
 
     it('should call the message callback if a reply', function(done) {
       rpc._pendingCalls[10] = {
-        callback: function(err, params) {
+        callback: function(err, msg) {
           expect(err).to.equal(null);
-          expect(params.referenceID).to.equal(10);
+          expect(msg.id).to.equal(10);
           done();
         }
-      }
+      };
       rpc._handleMessage(validMsg2, { address: '127.0.0.1', port: 1234 });
     });
 
@@ -170,11 +184,11 @@ describe('Transports/HTTP', function() {
       var rpc = new RPC(contact);
       var freshHandler = sinon.stub();
       var staleHandler = sinon.spy();
-      rpc._pendingCalls['rpc_id_1'] = {
+      rpc._pendingCalls.rpc_id_1 = {
         timestamp: new Date('1970-1-1'),
         callback: staleHandler
       };
-      rpc._pendingCalls['rpc_id_2'] = {
+      rpc._pendingCalls.rpc_id_2 = {
         timestamp: new Date('3070-1-1'),
         callback: freshHandler
       };

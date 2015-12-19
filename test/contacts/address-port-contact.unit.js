@@ -33,16 +33,16 @@ describe('AddressPortContact', function() {
     });
 
     it('should use the given nodeID instead of generating one', function() {
-      var i = hat(constants.B)
+      var i = hat(constants.B);
       var c = AddressPortContact({ address: '0.0.0.0', port: 1337, nodeID: i });
       expect(c.nodeID).to.equal(i);
     });
 
     it('should throw with an invalid supplied nodeID', function() {
       expect(function() {
-        var i = hat(24)
+        var i = hat(24);
         var opts = { address: '0.0.0.0', port: 1337, nodeID: i };
-        var c = AddressPortContact(opts);
+        AddressPortContact(opts);
       }).to.throw(Error, 'Invalid nodeID was supplied');
     });
 

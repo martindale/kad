@@ -117,7 +117,7 @@ describe('Bucket', function() {
 
     it('should do nothing if contact is not found', function() {
       expect(bucket.getSize()).to.equal(2);
-      var contact = AddressPortContact({ address: '0.0.0.3', port: 1337 })
+      var contact = AddressPortContact({ address: '0.0.0.3', port: 1337 });
       bucket.removeContact(contact);
       expect(bucket.getSize()).to.equal(2);
     });
