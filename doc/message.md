@@ -8,22 +8,20 @@ response; used by `rpc.send()`.
 
 Returns a `Buffer` representation of the JSON serialized message.
 
-Message.isRequest(message)
-==========================
+---
+
+## Message.isRequest(message)
 
 Returns a boolean indicating if the given message is a request.
 
-Message.isResponse(message)
-===========================
+## Message.isResponse(message)
 
 Returns a boolean indicating if the given message is a response.
 
-Message.fromBuffer(buffer)
-==========================
+## Message.fromBuffer(buffer)
 
 Returns an instance of `Message` from the given `Buffer`.
 
-Message.createID()
-==================
+## Message.createID()
 
 Generates a random message identifier string and returns it.
