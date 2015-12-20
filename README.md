@@ -18,7 +18,6 @@ Create your node, plug in your storage adapter, join the network, and party!
 
 ```js
 var kademlia = require('kad');
-var kadfs = require('kad-fs');
 
 var seed = {
   address: '127.0.0.1',
@@ -38,7 +37,7 @@ dht.connect(seed, function(err) {
 });
 ```
 
-For complete documentation on using and extending Kad, see the [`docs/`](docs/)
+For complete documentation on using and extending Kad, see the [`doc/`](doc/)
 directory. You can build Kad for the browser by running:
 
 ```

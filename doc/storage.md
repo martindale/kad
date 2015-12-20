@@ -9,7 +9,7 @@ adapters contributed by the community.
 Uses a directory on the filesystem to store items as files named by their key.
 
 * Author: [gordonwritescode](https://github.com/gordonwritescode)
-* Repository: [kad-localstorage](https://github.com/gordonwritescode/kad-fs)
+* Repository: [kad-fs](https://github.com/gordonwritescode/kad-fs)
 
 ## Class: LocalStorage(namespace)
 
