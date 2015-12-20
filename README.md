@@ -10,6 +10,9 @@ hash table for Node.js and the browser.
 
 ## Quick Start
 
+**For complete documentation on using and extending Kad,
+[read the documentation](doc/).** 
+
 ```bash
 npm install kad@1.1.0-beta
 ```
@@ -37,8 +40,7 @@ dht.connect(seed, function(err) {
 });
 ```
 
-For complete documentation on using and extending Kad, see the [`doc/`](doc/)
-directory. You can build Kad for the browser by running:
+You can build Kad for the browser by running:
 
 ```
 npm run browser-bundle
