@@ -4,7 +4,7 @@ Class: Router(options)
 Represents a routing table of known `Contact`s; used by `Node`. Accepts an
 options dictionary to configure it's behavior:
 
-* `rpc` - _required_: an instance of [`RPC`](rpc.md)
+* `transport` - _required_: an instance of [`RPC`](rpc.md)
 * `logger` - _optional_: a [`Logger`](logger.md) instance
 * `validator` - _optional_: a validator function; see [`Node`](node.md)
 
