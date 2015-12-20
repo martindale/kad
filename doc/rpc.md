@@ -31,10 +31,10 @@ Closes the underlying transport by calling the child class's `_close()` method.
 
 ## Using Middleware
 
-The `kademlia.RPC` class exposes a middleware interface for pre-processing
-incoming messages for passing them off the Kad for handling. This is especially
-useful for implementations that wish to extend their DHT with additional
-behaviors.
+The `kademlia.RPC` class exposes a [middleware](middleware.md) interface for
+pre-processing incoming messages for passing them off the Kad for handling.
+This is especially useful for implementations that wish to extend their DHT
+with additional behaviors.
 
 Middleware functions are executed in the order they are registered. Calling
 `next(err)`, will exit the middleware stack and prevent Kad from handling the
