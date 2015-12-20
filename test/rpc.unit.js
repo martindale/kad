@@ -5,8 +5,8 @@ var AddressPortContact = require('../lib/contacts/address-port-contact');
 var RPC = require('../lib/rpc');
 var inherits = require('util').inherits;
 
-function FakeTransport(options) {
-  RPC.call(this, options);
+function FakeTransport(contact, options) {
+  RPC.call(this, contact, options);
 }
 
 inherits(FakeTransport, RPC);
@@ -22,7 +22,8 @@ describe('RPC', function() {
     it('should use replyto if it exists', function() {
       var rpc = new FakeTransport({
         address: '0.0.0.0',
-        port: 8080,
+        port: 8080
+      }, {
         replyto: {
           address: 'mydomain.tld',
           port: 80

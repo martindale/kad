@@ -9,6 +9,7 @@ var AddressPortContact = require('../lib/contacts/address-port-contact');
 var Bucket = require('../lib/bucket');
 var EventEmitter = require('events').EventEmitter;
 var Logger = require('../lib/logger');
+var transports = require('../lib/transports');
 
 function FakeStorage() {
   this.data = {};
@@ -41,8 +42,10 @@ describe('Node', function() {
 
     it('should put a valid key/value pair', function() {
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65528,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65528
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -53,10 +56,12 @@ describe('Node', function() {
 
     it('should send a key/value pair to validator', function(done) {
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65528,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65528
+        }),
         storage: new FakeStorage(),
-        validate: function(key, value) {
+        validator: function(key, value) {
           expect(key).to.equal('key');
           expect(value).to.equal('value');
           done();
@@ -68,10 +73,12 @@ describe('Node', function() {
 
     it('should not put an invalid key/value pair', function() {
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65528,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65528
+        }),
         storage: new FakeStorage(),
-        validate: function(key, value, callback) {
+        validator: function(key, value, callback) {
           callback(false);
         },
         logger: new Logger(0)
@@ -87,8 +94,10 @@ describe('Node', function() {
 
     it('should ping contact at head if bucket is full', function(done) {
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65527,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65527
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -125,8 +134,10 @@ describe('Node', function() {
 
     it('should pong the contact', function(done) {
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65526,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65526
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -153,8 +164,10 @@ describe('Node', function() {
 
     it('should halt if invalid key', function() {
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65525,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65525
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -179,8 +192,10 @@ describe('Node', function() {
 
     it('should halt if no value', function() {
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65525,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65525
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -204,10 +219,12 @@ describe('Node', function() {
 
     it('should halt if invalid key/value', function() {
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65525,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65525
+        }),
         storage: new FakeStorage(),
-        validate: function(key, value, callback) {
+        validator: function(key, value, callback) {
           callback(false);
         },
         logger: new Logger(0)
@@ -232,10 +249,12 @@ describe('Node', function() {
 
     it('should send key/value pair to validator', function(done) {
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65525,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65525
+        }),
         storage: new FakeStorage(),
-        validate: function(key, value) {
+        validator: function(key, value) {
           expect(key).to.equal(utils.createID('key'));
           expect(value).to.equal('value');
           done();
@@ -265,8 +284,10 @@ describe('Node', function() {
 
     it('should send contacts if no value found', function(done) {
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65523,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65523
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -294,8 +315,10 @@ describe('Node', function() {
 
     it('should pass along error if _findValue fails', function(done) {
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65522,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65522
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -312,8 +335,10 @@ describe('Node', function() {
     it('should return the value in storage', function(done) {
       var storage = new FakeStorage();
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65522,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65522
+        }),
         storage: storage,
         logger: new Logger(0)
       });
@@ -331,8 +356,10 @@ describe('Node', function() {
 
     var stream = new EventEmitter();
     var node = KNode({
-      address: '0.0.0.0',
-      port: 65521,
+      transport: transports.UDP({
+        address: '0.0.0.0',
+        port: 65521
+      }),
       storage: new FakeStorage(),
       logger: new Logger(0)
     });
@@ -402,8 +429,10 @@ describe('Node', function() {
 
     var stream = new EventEmitter();
     var node = KNode({
-      address: '0.0.0.0',
-      port: 65520,
+      transport: transports.UDP({
+        address: '0.0.0.0',
+        port: 65520
+      }),
       storage: new FakeStorage(),
       logger: new Logger(0)
     });

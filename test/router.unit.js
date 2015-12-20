@@ -8,6 +8,7 @@ var Item = require('../lib/item');
 var AddressPortContact = require('../lib/contacts/address-port-contact');
 var KNode = require('../lib/node');
 var Logger = require('../lib/logger');
+var transports = require('../lib/transports');
 
 function FakeStorage() {
   this.data = {};
@@ -40,8 +41,10 @@ describe('Router', function() {
 
     it('should callback with an error if no value is found', function(done) {
       var node = KNode({
-        address: '0.0.0.0',
-        port: 65528,
+        transport: transports.UDP({
+          address: '0.0.0.0',
+          port: 65528
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -61,8 +64,10 @@ describe('Router', function() {
 
     it('should remove the contact from the shortlist on error', function(done) {
       var node = new KNode({
-        address: '127.0.0.1',
-        port: 0,
+        transport: transports.UDP({
+          address: '127.0.0.1',
+          port: 0
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -86,8 +91,10 @@ describe('Router', function() {
 
     it('should track contact without value to store later', function(done) {
       var node = new KNode({
-        address: '127.0.0.1',
-        port: 0,
+        transport: transports.UDP({
+          address: '127.0.0.1',
+          port: 0
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -113,8 +120,10 @@ describe('Router', function() {
 
     it('should remove contact from shortlist when JSON is bad', function(done) {
       var node = new KNode({
-        address: '127.0.0.1',
-        port: 0,
+        transport: transports.UDP({
+          address: '127.0.0.1',
+          port: 0
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -140,11 +149,13 @@ describe('Router', function() {
 
     it('should remove contact from shortlist when invalid', function(done) {
       var node = new KNode({
-        address: '127.0.0.1',
-        port: 0,
+        transport: transports.UDP({
+          address: '127.0.0.1',
+          port: 0
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0),
-        validate: function(key, value, callback) {
+        validator: function(key, value, callback) {
           callback(false);
         }
       });
@@ -172,10 +183,12 @@ describe('Router', function() {
 
     it('should send key/value pair to validator', function(done) {
       var node = new KNode({
-        address: '127.0.0.1',
-        port: 0,
+        transport: transports.UDP({
+          address: '127.0.0.1',
+          port: 0
+        }),
         storage: new FakeStorage(),
-        validate: function(key, value) {
+        validator: function(key, value) {
           expect(key).to.equal('foo');
           expect(value).to.equal('boop');
           done();
@@ -202,8 +215,10 @@ describe('Router', function() {
 
     it('should callback with the shortlist if it is full', function(done) {
       var node = new KNode({
-        address: '127.0.0.1',
-        port: 0,
+        transport: transports.UDP({
+          address: '127.0.0.1',
+          port: 0
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -224,8 +239,10 @@ describe('Router', function() {
 
     it('should store at closest node that did not have value', function(done) {
       var node = new KNode({
-        address: '127.0.0.1',
-        port: 0,
+        transport: transports.UDP({
+          address: '127.0.0.1',
+          port: 0
+        }),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
