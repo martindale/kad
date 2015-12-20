@@ -67,6 +67,25 @@ transport.on('error', function(err) {
 });
 ```
 
+### Request/Response Handling
+
+The middleware stack gets applied to both requests **and** responses. If you
+need your middleware to only apply to one or the other, use the
+[`Message`](message.md) module to check the type of message:
+
+```js
+var Message = kademlia.Message;
+
+// only apply this middleware to requests
+transport.use(function(message, contact, next) {
+  // return early and move to next middleware if this is not a request
+  if (!Message.isRequest(message)) {
+    return next();
+  }
+  // otherwise do fancy middleware stuff ...
+});
+```
+
 ## API for Transport Implementors
 
 The primary focus for Kad's design was to create a simple, sane, minimally
