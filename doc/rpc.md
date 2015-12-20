@@ -7,8 +7,8 @@ The base class for all transports; used by the included `kad.transports.UDP`,
 It accepts an instance of [`kad.Contact`](contact.md) and an optional options
 dictionary to configure it's behavior:
 
-* `replyto` - _optional_:
-* `logger` - _optional_:
+* `replyto` - _optional_: a `Contact` to provide other nodes to communicate back if different public address information
+* `logger` - _optional_: a custom `Logger`
 
 ## rpc.send(contact, message[, callback])
 
@@ -18,11 +18,54 @@ received or with an `err` if the request times out.
 This method wraps the child class's (commonly referred to as the "transport
 adapter") `_send()` method, using it to actually send the message.
 
+## rpc.use(middleware)
+
+Registers a middleware function to perform custom behavior before letting Kad
+handle the message. Callback receives `(message, contact, next)`.
+
 ## rpc.close()
 
 Closes the underlying transport by calling the child class's `_close()` method.
 
 ---
+
+## Using Middleware
+
+The `kademlia.RPC` class exposes a middleware interface for pre-processing
+incoming messages for passing them off the Kad for handling. This is especially
+useful for implementations that wish to extend their DHT with additional
+behaviors.
+
+Middleware functions are executed in the order they are registered. Calling
+`next(err)`, will exit the middleware stack and prevent Kad from handling the
+message. *You should always define an `error` handler, otherwise `RPC` will
+throw*.
+
+### Example: Simple Blacklist Middleware
+
+```js
+// array of blacklisted nodeID's
+var blacklist = [];
+// use a logger to print when a blacklisted node talks
+var logger = kademlia.Logger(3);
+// the transport adapter we will pass to our `Node`
+var transport = kademlia.transports.UDP(contact, options);
+
+// register a middleware function to check blacklist
+transport.use(function checkBlacklist(message, contact, next) {
+  // exit middleware stack if contact is blacklisted
+  if (blacklist.indexOf(contact.nodeID) !== -1) {
+    return next(new Error('Message dropped from blacklisted contact'));
+  }
+  // otherwise pass on
+  next();
+});
+
+// handle errors from RPC
+transport.on('error', function(err) {
+  logger.warn('RPC error raised, reason: %s', err.message);
+});
+```
 
 ## API for Transport Implementors
 
@@ -51,6 +94,7 @@ var dgram = require('dgram');
 
 // Define your Transport as a constructor function
 function UDPTransport(contact, options) {
+  var self = this;
 
   // Make sure that it can be instantiated without the `new` keyword
   if (!(this instanceof UDPTransport)) {
@@ -64,11 +108,14 @@ function UDPTransport(contact, options) {
   this._socket = dgram.createSocket({
     type: 'udp4',
     reuseAddr: true
-  }, this._handleMessage.bind(this));
+  }, function(messageBuffer) {
+    // Call RPC _handleMessage when ready for Kad to handle message
+    self._handleMessage(messageBuffer);
+  });
 
   // Start listening for UDP messages on the supplied address and port
   this._socket.bind(contact.port, contact.address);
-  
+
 }
 
 // Inherit for `kademlia.RPC`
