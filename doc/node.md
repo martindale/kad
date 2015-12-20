@@ -7,7 +7,7 @@ It accepts an `options` dictionary to configure it's behavior:
 
 * `storage` - _required_: the storage adapter of your choice; see [Storage](storage.md).
 * `transport` - _required_: instance of the transport adapter to be used; see [RPC](rpc.md).
-* `router` - _optional_: a custom router to use; see [`Router`](router.md).
+* `router` - _optional_: a custom router to use; see [`Router`](router.md); one is created by default.
 * `validator` - _optional_: function for validating key/value pairs; see [Validation](#validation).
 * `logger` - _optional_: logger object to use; see [`Logger`](logger.md).
 

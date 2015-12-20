@@ -4,8 +4,8 @@ Contributing
 [![Stories in Ready](https://badge.waffle.io/gordonwritescode/kad.svg?label=ready&title=Ready)](http://waffle.io/gordonwritescode/kad)
 
 This document outlines general patterns and and conventions for contributing
-to the project. For in-depth documentation on Kad, see the [`doc/`](doc/)
-directory.
+to the project. **For in-depth documentation on Kad, see the [`doc/`](doc/)
+directory.**
 
 Coding Style
 ------------
@@ -46,8 +46,8 @@ Test Coverage
 -------------
 
 At the time of writing, Kad has almost complete code coverage (>95%) through
-the it's thourough test suite. It is important to never decrease coverage, so
-be sure to include tests for any new code.
+it's test suite. It is important to never decrease coverage, so be sure to
+include tests for any new code.
 
 You can run the coverage report with:
 
