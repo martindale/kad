@@ -2,6 +2,8 @@
 
 var expect = require('chai').expect;
 var sinon = require('sinon');
+var proxyquire = require('proxyquire');
+var EventEmitter = require('events').EventEmitter;
 var RPC = require('../../lib/transports/http');
 var AddressPortContact = require('../../lib/contacts/address-port-contact');
 var Message = require('../../lib/message');
@@ -29,6 +31,59 @@ describe('Transports/HTTP', function() {
         expect(rpc._server.address().address).to.equal('0.0.0.0');
         expect(typeof rpc._server.address().port).to.equal('number');
         done();
+      });
+    });
+
+    it('should pass null the handleMessage if parsing fails', function(done) {
+      var req = new EventEmitter();
+      var res = new EventEmitter();
+      var contact = new AddressPortContact({ address: '0.0.0.0', port: 0 });
+      var HTTP = proxyquire('../../lib/transports/http', {
+        http: {
+          createServer: function(onConnect) {
+            onConnect(req, res);
+            return { listen: sinon.stub() };
+          }
+        }
+      });
+      var rpc = new HTTP(contact);
+      var _handleMessage = sinon.stub(rpc, '_handleMessage', function(buff) {
+        expect(buff).to.equal(null);
+        _handleMessage.restore();
+        done();
+      });
+      setImmediate(function() {
+        req.emit('end');
+      });
+    });
+
+    it('should pass pass on the message if it is a response', function(done) {
+      var req = new EventEmitter();
+      var res = new EventEmitter();
+      var contact = new AddressPortContact({ address: '0.0.0.0', port: 0 });
+      var HTTP = proxyquire('../../lib/transports/http', {
+        http: {
+          createServer: function(onConnect) {
+            onConnect(req, res);
+            return { listen: sinon.stub() };
+          }
+        }
+      });
+      var rpc = new HTTP(contact);
+      var _handleMessage = sinon.stub(rpc, '_handleMessage', function(buff) {
+        expect(buff.toString()).to.equal(JSON.stringify({
+          id: 'response',
+          result: { contact: contact }
+        }));
+        _handleMessage.restore();
+        done();
+      });
+      setImmediate(function() {
+        req.emit('data', JSON.stringify({
+          id: 'response',
+          result: { contact: contact }
+        }));
+        req.emit('end');
       });
     });
 
@@ -197,6 +252,36 @@ describe('Transports/HTTP', function() {
       expect(freshHandler.callCount).to.equal(0);
       expect(staleHandler.callCount).to.equal(1);
       expect(staleHandler.getCall(0).args[0]).to.be.instanceOf(Error);
+    });
+
+  });
+
+  describe('#_send', function() {
+
+    it('should pass null to handleMessage on request error', function(done) {
+      var emitter = new EventEmitter();
+      emitter.end = sinon.stub();
+      var contact = new AddressPortContact({ address: '0.0.0.0', port: 0 });
+      var HTTP = proxyquire('../../lib/transports/http', {
+        http: {
+          request: function() {
+            return emitter;
+          },
+          createServer: function() {
+            return { listen: sinon.stub() };
+          }
+        }
+      });
+      var rpc = new HTTP(contact);
+      var _handleMessage = sinon.stub(rpc, '_handleMessage', function(buff) {
+        expect(buff).to.equal(null);
+        _handleMessage.restore();
+        done();
+      });
+      rpc._send(new Buffer(JSON.stringify({})), contact);
+      setImmediate(function() {
+        emitter.emit('error', new Error('Fail'));
+      });
     });
 
   });

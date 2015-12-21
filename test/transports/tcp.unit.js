@@ -2,6 +2,8 @@
 
 var expect = require('chai').expect;
 var sinon = require('sinon');
+var EventEmitter = require('events').EventEmitter;
+var proxyquire = require('proxyquire');
 var RPC = require('../../lib/transports/tcp');
 var AddressPortContact = require('../../lib/contacts/address-port-contact');
 var Message = require('../../lib/message');
@@ -195,6 +197,46 @@ describe('Transports/TCP', function() {
       expect(freshHandler.callCount).to.equal(0);
       expect(staleHandler.callCount).to.equal(1);
       expect(staleHandler.getCall(0).args[0]).to.be.instanceOf(Error);
+    });
+
+  });
+
+  describe('#_send', function() {
+
+    it('should log an error if once is encountered', function() {
+      var emitter = new EventEmitter();
+      emitter.write = sinon.stub();
+      var contact = new AddressPortContact({ address: '0.0.0.0', port: 0 });
+      var TCP = proxyquire('../../lib/transports/tcp', {
+        net: {
+          createConnection: function() {
+            return emitter;
+          }
+        }
+      });
+      var rpc = new TCP(contact);
+      var _log = sinon.stub(rpc._log, 'error');
+      rpc._send(new Buffer(JSON.stringify({id:'id'})), {});
+      setImmediate(function() {
+        emitter.emit('error', new Error('failed'));
+        expect(_log.called).to.equal(true);
+      });
+    });
+  });
+
+  describe('#_handleConnection', function() {
+
+    it('should close the socket on a parser error', function(done) {
+      var contact = new AddressPortContact({ address: '0.0.0.0', port: 0 });
+      var rpc = new RPC(contact);
+      var socket = new EventEmitter();
+      socket.close = sinon.stub();
+      rpc._handleConnection(socket);
+      setImmediate(function() {
+        socket.emit('data', 'not a json string');
+        expect(socket.close.called).to.equal(true);
+        done();
+      });
     });
 
   });
