@@ -1,10 +1,9 @@
 Class: Contact(options)
 =======================
 
-The base class that all [contacts](contacts/); used by the included
-[`AddressPortContact`](contacts/address-port-contact.md). Nodes provide each
-other with contact information which indicates how others should communicate
-with them.
+The base class from which custom contacts inherit; used by the included
+`AddressPortContact`. Nodes provide each other with contact information which
+indicates how others should communicate with them.
 
 ## contact.seen()
 
