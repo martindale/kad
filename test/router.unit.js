@@ -9,6 +9,7 @@ var AddressPortContact = require('../lib/contacts/address-port-contact');
 var KNode = require('../lib/node');
 var Logger = require('../lib/logger');
 var transports = require('../lib/transports');
+var Router = require('../lib/router');
 
 function FakeStorage() {
   this.data = {};
@@ -36,6 +37,43 @@ FakeStorage.prototype.createReadStream = function() {
 };
 
 describe('Router', function() {
+
+  describe('@constructor', function() {
+
+    it('should create instance without the new keyword', function() {
+      expect(Router({ transport: { } })).to.be.instanceOf(Router);
+    });
+
+  });
+
+  describe('#_validateKeyValuePair', function() {
+
+    it('should return callback true if no validator defined', function(done) {
+      var router = new Router({ transport: { } });
+      router._validateKeyValuePair('key', 'value', function(valid) {
+        expect(valid).to.equal(true);
+        done();
+      });
+    });
+
+  });
+
+  describe('#_pingContactAtHead', function() {
+
+    it('should replace contact at head with new if ping fails', function() {
+      var _rpc = { send: sinon.stub().callsArgWith(2, new Error()) };
+      var router = new Router({ transport: _rpc, logger: new Logger(0) });
+      var _bucket = {
+        getContact: sinon.stub().returns({}),
+        removeContact: sinon.stub(),
+        addContact: sinon.stub()
+      };
+      router._pingContactAtHead({}, _bucket);
+      expect(_bucket.removeContact.called).to.equal(true);
+      expect(_bucket.addContact.called).to.equal(true);
+    });
+
+  });
 
   describe('#findValue', function() {
 

@@ -24,12 +24,6 @@ describe('Message', function() {
       })).to.be.instanceOf(Message);
     });
 
-    it('should throw with invalid message type', function() {
-      expect(function() {
-        Message({ method: 'SOMETHING_WRONG', params: { contact: contact } });
-      }).to.throw(Error, 'Invalid message type');
-    });
-
   });
 
   describe('#serialize', function() {

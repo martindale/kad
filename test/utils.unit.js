@@ -1,5 +1,6 @@
 'use strict';
 
+var sinon = require('sinon');
 var expect = require('chai').expect;
 var constants = require('../lib/constants');
 var hat = require('hat');
@@ -124,6 +125,15 @@ describe('Utils', function() {
         utils.createID('beep'),
         utils.createID('boop')
       )).to.equal(159);
+    });
+
+    it('should return B if distance is 0', function() {
+      var _getDistance = sinon.stub(utils, 'getDistance').returns(0);
+      expect(utils.getBucketIndex(
+        'ffbfba8945192d408d3dcc52ba24903a00000000',
+        'ffbfba8945192d408d3dcc52ba24903a00000001'
+      )).to.equal(160);
+      _getDistance.restore();
     });
 
     it('should not collide', function() {

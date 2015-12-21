@@ -379,11 +379,11 @@ describe('Node', function() {
       setImmediate(function() {
         stream.emit('data', {
           key: utils.createID('beep'),
-          value: {
+          value: JSON.stringify({
             value: 'boop',
             timestamp: Date.now() - constants.T_REPUBLISH,
             publisher: utils.createID('some_other_node_id')
-          }
+          })
         });
       });
     });
@@ -398,11 +398,11 @@ describe('Node', function() {
       setImmediate(function() {
         stream.emit('data', {
           key: utils.createID('beep'),
-          value: {
+          value: JSON.stringify({
             value: 'boop',
             timestamp: Date.now() - constants.T_REPUBLISH,
             publisher: node._self.nodeID
-          }
+          })
         });
       });
     });
@@ -421,6 +421,68 @@ describe('Node', function() {
         done();
       });
       stream.emit('end');
+    });
+
+    it('should log error if failed to parse value', function(done) {
+      var _log = sinon.stub(node._log, 'error', function() {
+        _log.restore();
+        done();
+      });
+      node._replicate();
+      setImmediate(function() {
+        stream.emit('data', {
+          key: utils.createID('beep'),
+          value: {
+            value: 'boop',
+            timestamp: Date.now() - constants.T_REPUBLISH,
+            publisher: node._self.nodeID
+          }
+        });
+      });
+    });
+
+    it('should log error if failed to republish', function(done) {
+      var _put = sinon.stub(node, 'put', function(k, v, cb) {
+        cb(new Error('FAIL'));
+        _put.restore();
+      });
+      var _log = sinon.stub(node._log, 'error', function() {
+        _log.restore();
+        done();
+      });
+      node._replicate();
+      setImmediate(function() {
+        stream.emit('data', {
+          key: utils.createID('beep'),
+          value: JSON.stringify({
+            value: 'boop',
+            timestamp: Date.now() - constants.T_REPUBLISH,
+            publisher: node._self.nodeID
+          })
+        });
+      });
+    });
+
+    it('should log error if failed to replicate', function(done) {
+      var _put = sinon.stub(node, 'put', function(k, v, cb) {
+        cb(new Error('FAIL'));
+        _put.restore();
+      });
+      var _log = sinon.stub(node._log, 'error', function() {
+        _log.restore();
+        done();
+      });
+      node._replicate();
+      setImmediate(function() {
+        stream.emit('data', {
+          key: utils.createID('beep'),
+          value: JSON.stringify({
+            value: 'boop',
+            timestamp: Date.now() - constants.T_REPUBLISH,
+            publisher: utils.createID('some_other_node_id')
+          })
+        });
+      });
     });
 
   });
@@ -468,6 +530,55 @@ describe('Node', function() {
       });
     });
 
+    it('should log error on expiration failure', function(done) {
+      var _del = sinon.stub(node._storage, 'del', function(k, cb) {
+        cb(new Error('Fail'));
+        _del.restore();
+      });
+      var _log = sinon.stub(node._log, 'error', function() {
+        _log.restore();
+        done();
+      });
+      node._expire();
+      setImmediate(function() {
+        stream.emit('data', {
+          key: utils.createID('beep'),
+          value: {
+            value: 'boop',
+            timestamp: Date.now(),
+            publisher: utils.createID('some_other_node_id')
+          }
+        });
+        stream.emit('data', {
+          key: utils.createID('beep'),
+          value: {
+            value: 'boop',
+            timestamp: Date.now() - constants.T_EXPIRE,
+            publisher: utils.createID('some_other_node_id')
+          }
+        });
+      });
+    });
+
+    it('should not expire the item', function(done) {
+      var _del = sinon.stub(node._storage, 'del');
+      node._expire();
+      setImmediate(function() {
+        stream.emit('data', {
+          key: utils.createID('beep'),
+          value: {
+            value: 'boop',
+            timestamp: Date.now() - 10000000000,
+            publisher: utils.createID('some_other_node_id')
+          }
+        });
+        expect(_del.called).to.equal(false);
+        _del.restore();
+        done();
+      });
+
+    });
+
     it('should call the error handler', function(done) {
       var _error = sinon.stub(node._log, 'error', function() {
         _error.restore();
@@ -484,6 +595,59 @@ describe('Node', function() {
       stream.emit('end');
     });
 
+  });
+
+  describe('#_putValidatedKeyValue', function() {
+
+    it('should get nearest contacts if findNode fails', function(done) {
+      var rpc = new EventEmitter();
+      rpc._contact = { nodeID: utils.createID('publisher') };
+      var node = KNode({
+        storage: new FakeStorage(),
+        transport: rpc,
+        logger: new Logger(0)
+      });
+      var _findNode = sinon.stub(
+        node._router, 'findNode'
+      ).callsArgWith(1, null, []);
+      var _getNearestContacts = sinon.stub(
+        node._router, 'getNearestContacts'
+      ).returns([]);
+      node._putValidatedKeyValue('key', 'value', function() {
+        expect(_getNearestContacts.called).to.equal(true);
+        _findNode.restore();
+        _getNearestContacts.restore();
+        done();
+      });
+    });
+
+  });
+
+  describe('#_storeValidatedKeyValue', function(done) {
+    var rpc = new EventEmitter();
+    rpc._contact = {
+      nodeID: utils.createID('publisher')
+    };
+    rpc._createContact = sinon.stub().returns({});
+    rpc.send = sinon.stub();
+    var node = KNode({
+      storage: new FakeStorage(),
+      transport: rpc,
+      logger: new Logger(0)
+    });
+    var _warn = sinon.stub(node._log, 'warn');
+    var _put = sinon.stub(
+      node._storage, 'put'
+    ).callsArgWith(2, new Error('FAIL'));
+    node._storeValidatedKeyValue({}, {
+      params: { contact: {} },
+      id: 1
+    }, function() {
+      expect(_warn.called).to.equal(true);
+      _warn.restore();
+      _put.restore();
+      done();
+    });
   });
 
 });
