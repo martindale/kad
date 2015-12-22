@@ -1,6 +1,6 @@
 {
   "name": "kad",
-  "version": "1.1.0-beta.3",
+  "version": "1.1.0-beta.4",
   "description": "implementation of the kademlia dht for node",
   "main": "index.js",
   "directories": {
@@ -14,7 +14,8 @@
     "testsuite": "./node_modules/.bin/mocha test/** --recursive",
     "coverage": "./node_modules/.bin/istanbul cover -x 'lib/logger.js' ./node_modules/.bin/_mocha -- --recursive",
     "linter": "./node_modules/.bin/jshint --config .jshintrc ./index.js ./lib ./test",
-    "browser-bundle": "./node_modules/.bin/browserify index.js -s kad -o dist/kad.browser.js"
+    "build": "./node_modules/.bin/browserify index.js -s kad -o dist/kad.browser.js",
+    "simulation": "node script/simulation.js"
   },
   "keywords": [
     "dht",
@@ -43,6 +44,7 @@
     "hat": "0.0.3",
     "kad-fs": "0.0.4",
     "kad-localstorage": "0.0.7",
+    "kad-memstore": "0.0.1",
     "lodash": "^3.6.0",
     "merge": "^1.2.0",
     "ms": "^0.7.0"

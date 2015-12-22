@@ -15,7 +15,7 @@ hash table for Node.js and the browser.
 [read the documentation](doc/).**
 
 ```bash
-npm install kad@1.1.0-beta.3
+npm install kad@1.1.0-beta.4
 ```
 
 Create your node, plug in your storage adapter, join the network, and party!
@@ -44,11 +44,22 @@ dht.connect(seed, function(err) {
 You can build Kad for the browser by running:
 
 ```
-npm run browser-bundle
+npm run build
 ```
 
 > This will output to `dist/kad.browser.js` and will bind to `window` when
 > loaded in your web application.
+
+You can run a network simulation locally using the included simulator. This
+will create `n` nodes (as you define) and connect them to each other, sending
+`STORE` messages on an interval and printing information to the console.
+
+```bash
+# use the default of 6 nodes
+npm run simulation
+# specify as many nodes as you like
+npm run simulation 128
+```
 
 ## Transports
 
@@ -63,6 +74,9 @@ var dht = new kademlia.Node({
   transport: kademlia.transports.TCP(contact, options)
 });
 ```
+
+If you would like to author your own transport adapter, see
+[kad-transport-boilerplate](https://github.com/gordonwritescode/kad-transport-boilerplate).
 
 ### Community Transport Adapters
 

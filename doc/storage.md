@@ -18,6 +18,13 @@ Uses browser `localStorage` to store DHT items.
 * Author: [omphalos](https://github.com/omphalos)
 * Repository: [kad-localstorage](https://github.com/omphalos/kad-localstorage)
 
+## Class: MemStore()
+
+Uses an in-memory dictionary to store DHT items (useful for testing).
+
+* Author: [gordonwritescode](https://github.com/gordonwritescode)
+* Repository: [kad-memstore](https://github.com/gordonwritescode/kad-memstore)
+
 ## API for Storage Implementors
 
 Creating a storage a adapter for use with Kad is very simple. A storage adapter

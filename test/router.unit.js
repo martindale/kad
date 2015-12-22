@@ -288,9 +288,15 @@ describe('Router', function() {
       var contact1 = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
       var contact2 = new AddressPortContact({ address: '0.0.0.0', port: 1235 });
       var state = node._router._createLookupState(
-        'NODE',
+        'VALUE',
         utils.createID('foo')
       );
+      state.item = {
+        key: 'foo',
+        value: 'bar',
+        publisher: utils.createID('foo'),
+        timestamp: Date.now()
+      };
       state.contactsWithoutValue = [contact1, contact2];
       node._router._handleValueReturned(state, function() {
         expect(_send.callCount).to.equal(1);
