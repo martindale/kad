@@ -15,7 +15,7 @@ hash table for Node.js and the browser.
 [read the documentation](doc/).**
 
 ```bash
-npm install kad@1.1.0-beta.4
+npm install kad@1.2.0-beta
 ```
 
 Create your node, plug in your storage adapter, join the network, and party!
@@ -29,9 +29,12 @@ var seed = {
 };
 
 var dht = new kademlia.Node({
-  transport: kademlia.transports.UDP({
-    address: '127.0.0.1', port: 1337
-  }),
+  transport: kademlia.transports.UDP(
+    kademlia.contacts.AddressPortContact({
+      address: '127.0.0.1',
+      port: 1337
+    })
+  ),
   storage: kademlia.storage.FS('path/to/datadir')
 });
 
