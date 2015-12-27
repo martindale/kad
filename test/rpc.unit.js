@@ -83,4 +83,22 @@ describe('RPC', function() {
 
   });
 
+  describe('#before', function() {
+
+    
+
+  });
+
+  describe('#after', function() {
+
+    
+
+  });
+
+  describe('#_trigger', function() {
+
+    
+
+  });
+
 });
