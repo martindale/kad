@@ -64,6 +64,12 @@ The `kademlia.RPC` class triggers hooks for the following events:
 * `receive`
   * `before` handler receives `(message, contact, next)`
   * `after` handler receives nothing
+* `open`
+  * `before` handler receives `(next)`
+  * `after` handler receives nothing
+* `close`
+  * `before` handler receives `(next)`
+  * `after` handler receives nothing
 
 ### Example: Simple Blacklist Hook
 
