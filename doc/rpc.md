@@ -158,7 +158,7 @@ function UDPTransport(contact, options) {
 inherits(UDPTransport, kademlia.RPC);
 
 // Implement `_open` method to start server
-UDPTransport.prototype._open = function() {
+UDPTransport.prototype._open = function(ready) {
   // Create a UDP socket object
   this._socket = dgram.createSocket({
     type: 'udp4',
@@ -169,7 +169,7 @@ UDPTransport.prototype._open = function() {
   });
 
   // Start listening for UDP messages on the supplied address and port
-  this._socket.bind(contact.port, contact.address);
+  this._socket.bind(contact.port, contact.address, ready);
 };
 
 // Implement `_send` method to deliver a message
