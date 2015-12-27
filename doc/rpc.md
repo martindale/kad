@@ -18,10 +18,20 @@ received or with an `err` if the request times out.
 This method wraps the child class's (commonly referred to as the "transport
 adapter") `_send()` method, using it to actually send the message.
 
-## rpc.use(middleware)
+## rpc.receive(buffer)
 
-Registers a middleware function to perform custom behavior before letting Kad
-handle the message. Callback receives `(message, contact, next)`.
+Called by the subclassed transport implementation when a message is ready to
+be handled.
+
+## rpc.before(event, hook)
+
+Registers a middleware function to perform custom behavior before the specified
+event occurs. See [hooks](hooks.md).
+
+## rpc.after(event, hook)
+
+Registers a middleware function to perform custom behavior after the specified
+event occurs. See [hooks](hooks.md).
 
 ## rpc.close()
 
@@ -29,19 +39,33 @@ Closes the underlying transport by calling the child class's `_close()` method.
 
 ---
 
-## Using Middleware
+## Hooks
 
-The `kademlia.RPC` class exposes a [middleware](middleware.md) interface for
-pre-processing incoming messages for passing them off the Kad for handling.
-This is especially useful for implementations that wish to extend their DHT
-with additional behaviors.
+The `kademlia.RPC` class exposes a [hooks](hooks.md) interface for
+processing messages and implementing custom behaviors.
 
-Middleware functions are executed in the order they are registered. Calling
-`next(err)`, will exit the middleware stack and prevent Kad from handling the
-message. *You should always define an `error` handler, otherwise `RPC` will
-throw*.
+Hooks are executed in the order they are registered. Calling `next(err)` will
+exit the middleware stack and prevent Kad from handling the message. *You
+should always define an `error` handler, otherwise `RPC` will throw*.
 
-### Example: Simple Blacklist Middleware
+### Events
+
+The `kademlia.RPC` class triggers hooks for the following events:
+
+* `serialize`
+  * `before` handler receives `(message, next)`
+  * `after` handler receives nothing
+* `deserialize`
+  * `before` handler receives `(buffer, next)`
+  * `after` handler receives nothing
+* `send`
+  * `before` handler receives `(buffer, contact, next)`
+  * `after` handler receives nothing
+* `receive`
+  * `before` handler receives `(message, contact, next)`
+  * `after` handler receives nothing
+
+### Example: Simple Blacklist Hook
 
 ```js
 // array of blacklisted nodeID's
@@ -52,7 +76,7 @@ var logger = kademlia.Logger(3);
 var transport = kademlia.transports.UDP(contact, options);
 
 // register a middleware function to check blacklist
-transport.use(function checkBlacklist(message, contact, next) {
+transport.before('receive', function(message, contact, next) {
   // exit middleware stack if contact is blacklisted
   if (blacklist.indexOf(contact.nodeID) !== -1) {
     return next(new Error('Message dropped from blacklisted contact'));
@@ -77,7 +101,7 @@ need your middleware to only apply to one or the other, use the
 var Message = kademlia.Message;
 
 // only apply this middleware to requests
-transport.use(function(message, contact, next) {
+transport.before('receive', function(message, contact, next) {
   // return early and move to next middleware if this is not a request
   if (!Message.isRequest(message)) {
     return next();
@@ -99,7 +123,7 @@ When building a custom transport, there are a few simple steps:
 
 1. Implement a custom [`kad.Contact`](contact.md)
 3. Inherit your transport from `kademlia.RPC`
-4. Implement `_createContact`, `_send`, and `_close` methods
+4. Implement `_open`, `_send`, and `_close` methods
 
 A `Contact` contains the information your transport adapter needs to talk to
 other peers. A `Transport` defines how those peers communicate.
@@ -122,27 +146,24 @@ function UDPTransport(contact, options) {
 
   // Call `kademlia.RPC` to setup bindings
   kademlia.RPC.call(this, contact, options);
-
-  // Create a UDP socket object
-  this._socket = dgram.createSocket({
-    type: 'udp4',
-    reuseAddr: true
-  }, function(messageBuffer) {
-    // Call RPC _handleMessage when ready for Kad to handle message
-    self._handleMessage(messageBuffer);
-  });
-
-  // Start listening for UDP messages on the supplied address and port
-  this._socket.bind(contact.port, contact.address);
-
 }
 
 // Inherit for `kademlia.RPC`
 inherits(UDPTransport, kademlia.RPC);
 
-// Implement `_createContact` method
-UDPTransport.prototype._createContact = function(options) {
-  return new kademlia.contacts.AddressPortContact(options);
+// Implement `_open` method to start server
+UDPTransport.prototype._open = function() {
+  // Create a UDP socket object
+  this._socket = dgram.createSocket({
+    type: 'udp4',
+    reuseAddr: true
+  }, function(messageBuffer) {
+    // Call RPC.receive when ready for Kad to handle message
+    self.receive(messageBuffer);
+  });
+
+  // Start listening for UDP messages on the supplied address and port
+  this._socket.bind(contact.port, contact.address);
 };
 
 // Implement `_send` method to deliver a message

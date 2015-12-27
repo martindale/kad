@@ -38,7 +38,7 @@ describe('Transports/TCP', function() {
 
   describe('#_createContact', function() {
     it('should create an AddressPortContact', function() {
-      var rpc = new RPC({ address: '0.0.0.0', port: 1 });
+      var rpc = new RPC(AddressPortContact({ address: '0.0.0.0', port: 1 }));
       var contact = rpc._createContact({ address: '0.0.0.0', port: 0 });
       expect(contact).to.be.instanceOf(AddressPortContact);
     });
@@ -125,7 +125,7 @@ describe('Transports/TCP', function() {
 
   });
 
-  describe('#_handleMessage', function() {
+  describe('#receive', function() {
 
     var contact1 = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
     var contact2 = new AddressPortContact({ address: '0.0.0.0', port: 0 });
@@ -146,14 +146,14 @@ describe('Transports/TCP', function() {
       rpc.once('MESSAGE_DROP', function() {
         done();
       });
-      rpc._handleMessage(invalidJSON, {});
+      rpc.receive(invalidJSON, {});
     });
 
     it('should drop the message if invalid message type', function(done) {
       rpc.once('MESSAGE_DROP', function() {
         done();
       });
-      rpc._handleMessage(invalidMsg, {});
+      rpc.receive(invalidMsg, {});
     });
 
     it('should emit the message type if not a reply', function(done) {
@@ -161,7 +161,7 @@ describe('Transports/TCP', function() {
         expect(typeof data).to.equal('object');
         done();
       });
-      rpc._handleMessage(validMsg1, { address: '127.0.0.1', port: 1234 });
+      rpc.receive(validMsg1, { address: '127.0.0.1', port: 1234 });
     });
 
     it('should call the message callback if a reply', function(done) {
@@ -172,7 +172,7 @@ describe('Transports/TCP', function() {
           done();
         }
       };
-      rpc._handleMessage(validMsg2, { address: '127.0.0.1', port: 1234 });
+      rpc.receive(validMsg2, { address: '127.0.0.1', port: 1234 });
     });
 
   });

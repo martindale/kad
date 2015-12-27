@@ -1,11 +1,11 @@
 'use strict';
 
 var expect = require('chai').expect;
-var ProtocolFactory = require('../../lib/middleware/protocol');
+var ProtocolFactory = require('../../lib/hooks/protocol');
 var Message = require('../../lib/message');
 var AddressPortContact = require('../../lib/contacts/address-port-contact');
 
-describe('Middleware/Protocol', function() {
+describe('Hooks/Protocol', function() {
 
   it('should pass along if the message is a response', function(done) {
     var contact = AddressPortContact({ address: '127.0.0.1', port: 8080 });
@@ -14,14 +14,11 @@ describe('Middleware/Protocol', function() {
     protocol(response, contact, done);
   });
 
-  it('should pass an error if the method is not defined', function(done) {
+  it('should pass along if the method is not defined', function(done) {
     var contact = AddressPortContact({ address: '127.0.0.1', port: 8080 });
     var request = Message({ method: 'ECHO', params: { contact: contact } });
     var protocol = ProtocolFactory({});
-    protocol(request, contact, function(err) {
-      expect(err).to.be.instanceOf(Error);
-      done();
-    });
+    protocol(request, contact, done);
   });
 
   it('should call the method and send the response', function(done) {

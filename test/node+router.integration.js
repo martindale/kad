@@ -5,6 +5,7 @@ var sinon = require('sinon');
 var KNode = require('../lib/node');
 var transports = require('../lib/transports');
 var Logger = require('../lib/logger');
+var AddressPortContact = require('../lib/contacts/address-port-contact');
 
 function FakeStorage() {
   this.data = {};
@@ -50,66 +51,66 @@ var node10;
 var node11;
 
 var node1opts = {
-  transport: transports.UDP({
+  transport: transports.UDP(AddressPortContact({
     address: '127.0.0.1',
     port: 65520
-  }),
+  })),
   storage: storage1,
   logger: new Logger(0)
 };
 var node2opts = {
-  transport: transports.UDP({
+  transport: transports.UDP(AddressPortContact({
     address: '127.0.0.1',
     port: 65521
-  }),
+  })),
   storage: storage2,
   logger: new Logger(0)
 };
 var node3opts = {
-  transport: transports.UDP({
+  transport: transports.UDP(AddressPortContact({
     address: '127.0.0.1',
     port: 65522
-  }),
+  })),
   storage: storage3,
   logger: new Logger(0)
 };
 var node4opts = {
-  transport: transports.TCP({
+  transport: transports.TCP(AddressPortContact({
     address: '127.0.0.1',
     port: 65523
-  }),
+  })),
   storage: storage4,
   logger: new Logger(0)
 };
 var node5opts = {
-  transport: transports.TCP({
+  transport: transports.TCP(AddressPortContact({
     address: '127.0.0.1',
     port: 65524
-  }),
+  })),
   storage: storage5,
   logger: new Logger(0)
 };
 var node6opts = {
-  transport: transports.TCP({
+  transport: transports.TCP(AddressPortContact({
     address: '127.0.0.1',
     port: 65525
-  }),
+  })),
   storage: storage6,
   logger: new Logger(0)
 };
 var node10opts = {
-  transport: transports.HTTP({
+  transport: transports.HTTP(AddressPortContact({
     address: '127.0.0.1',
     port: 30000
-  }),
+  })),
   storage: storage10,
   logger: new Logger(0)
 };
 var node11opts = {
-  transport: transports.HTTP({
+  transport: transports.HTTP(AddressPortContact({
     address: '127.0.0.1',
     port: 30001
-  }),
+  })),
   storage: storage11,
   logger: new Logger(0)
 };
@@ -121,10 +122,10 @@ describe('Node+Router', function() {
     it('should create an instance with the `new` keyword', function() {
       expect(new KNode({
         storage: storage1,
-        transport: transports.UDP({
+        transport: transports.UDP(AddressPortContact({
           address: '0.0.0.0',
           port: 0
-        }),
+        })),
         logger: new Logger(0)
       })).to.be.instanceOf(KNode);
     });
@@ -132,10 +133,10 @@ describe('Node+Router', function() {
     it('should create an instance without the `new` keyword', function() {
       expect(KNode({
         storage: storage1,
-        transport: transports.UDP({
+        transport: transports.UDP(AddressPortContact({
           address: '0.0.0.0',
           port: 0
-        }),
+        })),
         logger: new Logger(0)
       })).to.be.instanceOf(KNode);
     });
@@ -143,10 +144,10 @@ describe('Node+Router', function() {
     it('should throw if no storage adapter is supplied', function() {
       expect(function() {
         KNode({
-          transport: transports.UDP({
+          transport: transports.UDP(AddressPortContact({
             address: '0.0.0.0',
             port: 0
-          }),
+          })),
           logger: new Logger(0)
         });
       }).to.throw(Error, 'No storage adapter supplied');
@@ -215,10 +216,10 @@ describe('Node+Router', function() {
 
     it('should emit an error if the connection fails', function(done) {
       var node = KNode({
-        transport: transports.UDP({
+        transport: transports.UDP(AddressPortContact({
           address: '127.0.0.1',
           port: 65532
-        }),
+        })),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -234,10 +235,10 @@ describe('Node+Router', function() {
 
     it('should not require a callback', function(done) {
       var node = KNode({
-        transport: transports.UDP({
+        transport: transports.UDP(AddressPortContact({
           address: '127.0.0.1',
           port: 65531
-        }),
+        })),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });
@@ -284,10 +285,10 @@ describe('Node+Router', function() {
 
     it('should callback with an error if _findNode fails', function(done) {
       var node = KNode({
-        transport: transports.UDP({
+        transport: transports.UDP(AddressPortContact({
           address: '127.0.0.1',
           port: 65530
-        }),
+        })),
         storage: new FakeStorage(),
         logger: new Logger(0)
       });

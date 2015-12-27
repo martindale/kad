@@ -47,9 +47,9 @@ describe('Transports/HTTP', function() {
         }
       });
       var rpc = new HTTP(contact);
-      var _handleMessage = sinon.stub(rpc, '_handleMessage', function(buff) {
+      var receive = sinon.stub(rpc, 'receive', function(buff) {
         expect(buff).to.equal(null);
-        _handleMessage.restore();
+        receive.restore();
         done();
       });
       setImmediate(function() {
@@ -70,12 +70,12 @@ describe('Transports/HTTP', function() {
         }
       });
       var rpc = new HTTP(contact);
-      var _handleMessage = sinon.stub(rpc, '_handleMessage', function(buff) {
+      var receive = sinon.stub(rpc, 'receive', function(buff) {
         expect(buff.toString()).to.equal(JSON.stringify({
           id: 'response',
           result: { contact: contact }
         }));
-        _handleMessage.restore();
+        receive.restore();
         done();
       });
       setImmediate(function() {
@@ -91,7 +91,7 @@ describe('Transports/HTTP', function() {
 
   describe('#_createContact', function() {
     it('should create an AddressPortContact', function() {
-      var rpc = new RPC({ address: '0.0.0.0', port: 1 });
+      var rpc = new RPC(AddressPortContact({ address: '0.0.0.0', port: 1 }));
       var contact = rpc._createContact({ address: '0.0.0.0', port: 0 });
       expect(contact).to.be.instanceOf(AddressPortContact);
     });
@@ -180,7 +180,7 @@ describe('Transports/HTTP', function() {
 
   });
 
-  describe('#_handleMessage', function() {
+  describe('#receive', function() {
 
     var contact1 = new AddressPortContact({ address: '0.0.0.0', port: 1234 });
     var contact2 = new AddressPortContact({ address: '0.0.0.0', port: 0 });
@@ -201,14 +201,14 @@ describe('Transports/HTTP', function() {
       rpc.once('MESSAGE_DROP', function() {
         done();
       });
-      rpc._handleMessage(invalidJSON, {});
+      rpc.receive(invalidJSON, {});
     });
 
     it('should drop the message if invalid message type', function(done) {
       rpc.once('MESSAGE_DROP', function() {
         done();
       });
-      rpc._handleMessage(invalidMsg, {});
+      rpc.receive(invalidMsg, {});
     });
 
     it('should emit the message type if not a reply', function(done) {
@@ -216,7 +216,7 @@ describe('Transports/HTTP', function() {
         expect(typeof data).to.equal('object');
         done();
       });
-      rpc._handleMessage(validMsg1, { address: '127.0.0.1', port: 1234 });
+      rpc.receive(validMsg1, { address: '127.0.0.1', port: 1234 });
     });
 
     it('should call the message callback if a reply', function(done) {
@@ -227,7 +227,7 @@ describe('Transports/HTTP', function() {
           done();
         }
       };
-      rpc._handleMessage(validMsg2, { address: '127.0.0.1', port: 1234 });
+      rpc.receive(validMsg2, { address: '127.0.0.1', port: 1234 });
     });
 
   });
@@ -273,9 +273,9 @@ describe('Transports/HTTP', function() {
         }
       });
       var rpc = new HTTP(contact);
-      var _handleMessage = sinon.stub(rpc, '_handleMessage', function(buff) {
+      var receive = sinon.stub(rpc, 'receive', function(buff) {
         expect(buff).to.equal(null);
-        _handleMessage.restore();
+        receive.restore();
         done();
       });
       rpc._send(new Buffer(JSON.stringify({})), contact);

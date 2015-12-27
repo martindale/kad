@@ -13,10 +13,6 @@ function FakeTransport(contact, options) {
 
 inherits(FakeTransport, RPC);
 
-FakeTransport.prototype._createContact = function(options) {
-  return new AddressPortContact(options);
-};
-
 describe('RPC', function() {
 
   describe('#_createContact', function() {
@@ -29,14 +25,14 @@ describe('RPC', function() {
     });
 
     it('should use replyto if it exists', function() {
-      var rpc = new FakeTransport({
+      var rpc = new FakeTransport(AddressPortContact({
         address: '0.0.0.0',
         port: 8080
-      }, {
-        replyto: {
+      }), {
+        replyto: AddressPortContact({
           address: 'mydomain.tld',
           port: 80
-        }
+        })
       });
       expect(rpc._contact.address).to.equal('mydomain.tld');
       expect(rpc._contact.port).to.equal(80);
@@ -44,59 +40,16 @@ describe('RPC', function() {
 
   });
 
-  describe('#_close', function() {
-
-    it('should throw if not implemented', function() {
-      expect(function() {
-        var rpc = new FakeTransport({ address: '0.0.0.0', port: 8080 });
-        rpc._close();
-      }).to.throw(Error);
-    });
-
-  });
-
-  describe('#_send', function() {
-
-    it('should throw if not implemented', function() {
-      expect(function() {
-        var rpc = new FakeTransport({ address: '0.0.0.0', port: 8080 });
-        rpc._send();
-      }).to.throw(Error);
-    });
-
-  });
-
-  describe('#use', function() {
-
-    it('should add the function to the middleware stack', function() {
-      var rpc = new FakeTransport({ address: '0.0.0.0', port: 8080 });
-      var middleware = function() {};
-      rpc.use(middleware);
-      expect(rpc._middleware[0]).to.equal(middleware);
-    });
-
-  });
-
-  describe('#_initMiddlewareStack', function() {
-
-    it('should return a copy of the stack bound to rpc', function() {
-      var rpc = new FakeTransport({ address: '0.0.0.0', port: 8080 });
-      var middleware = function() { return this; };
-      rpc.use(middleware);
-      var stack = rpc._initMiddlewareStack();
-      expect(stack[0]()).to.equal(rpc);
-    });
-
-  });
-
-  describe('#_handleMessage', function() {
+  describe('#receive', function() {
 
     it('should emit an error if a middleware breaks', function(done) {
-      var rpc = new FakeTransport({ address: '0.0.0.0', port: 8080 });
+      var rpc = new FakeTransport(AddressPortContact({
+        address: '0.0.0.0', port: 8080
+      }));
       var middleware = function(message, contact, next) {
         next(new Error('FAIL'));
       };
-      rpc.use(middleware);
+      rpc.before('receive', middleware);
       var message = Message({
         method: 'PING',
         params: { contact: { address: '0.0.0.0', port: 8080 } },
@@ -106,7 +59,7 @@ describe('RPC', function() {
         expect(err.message).to.equal('FAIL');
         done();
       });
-      rpc._handleMessage(message.serialize());
+      rpc.receive(message.serialize());
     });
 
   });
@@ -114,7 +67,9 @@ describe('RPC', function() {
   describe('#_execPendingCallback', function() {
 
     it('should should warn about dropped message', function(done) {
-      var rpc = new FakeTransport({ address: '0.0.0.0', port: 8080 });
+      var rpc = new FakeTransport(AddressPortContact({
+        address: '0.0.0.0', port: 8080
+      }));
       var message = Message({
         result: { contact: { address: '0.0.0.0', port: 8080 } },
         id: 'test'

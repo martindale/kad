@@ -1,16 +1,17 @@
-Module: middleware
+Module: hooks
 ==================
 
-The middleware module acts as meta-package for commonly used middleware for use
+The hooks module acts as meta-package for commonly used middleware for use
 with your [transport adapter](rpc.md).
 
-Middleware is registered using the transport adapter's `use()` method:
+Hooks are registered using the transport adapter's `before()` and `after()`
+methods:
 
 ```js
 var blacklist = [];
 var transport = kademlia.transports.UDP(contact);
 
-transport.use(kademlia.middleware.blacklist(blacklist));
+transport.before('receive', kademlia.hooks.blacklist(blacklist));
 ```
 
 ## whitelist(whitelist)
@@ -44,7 +45,7 @@ var protocol = {
 };
 
 // register the middleware
-transport.use(kademlia.middleware.protocol(protocol));
+transport.before('receive', kademlia.hooks.protocol(protocol));
 
 // now we can use the protocol extensions
 transport.send(contact, kademlia.Message({
